@@ -1,2 +1,2 @@
-# Greenhouse - Communication
+# Greenhouse: Communication
 
