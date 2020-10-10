@@ -1,2 +1,2 @@
-clear && mkdir -p build && rm -rf ./build/*;
+clear && mkdir -p build && rm -rf ./build/*
 
