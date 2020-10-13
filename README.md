@@ -41,5 +41,31 @@ list and read the logged files, control, configure and calibrate the system.
 
 ### Defined Requirements:
 
+## MQTT
+
+* [ReqID:01] It shall be possible to connect an ESP32 to internet via WiFi. 
+* [ReqID:02] An MQTT server/broker should be created. 
+* [ReqID:03] It shall possible then to connect to an MQTT broker. 
+* [ReqID:04] It shall be possible to create variables for every signal/sensor in the MQTT broker.
+* [ReqID:05] It shall be possible to create variables for actuators, configurating and calibrating in the system.
+* [ReqID:06] It shall be possible to publish sensor values to their variables in the broker periodacally (1000ms)
+* [ReqID:07] It shall be possible to subscribe values or control the systems actuators from the MQTT broker. 
+* [ReqID:08] It shall be possible to configure and calibrate values from the MQTT broker.
+* Overall it should be possible to monitor and control everything over the MQTT server.
+
+## Terminal
+
+* [ReqID:09] It shall possible to have a terminal menu.
+* [ReqID:10] The menu shall have an option to view snapshots of the system. 
+* [ReqID:11] The menu shall have an option to control the systems actuators. 
+* [ReqID:12] The menu shall have an option to calibrate and configure the systems values. 
+* [ReqID:13] It shall be possible to fetch log files from SD Card. 
+
+## SD Card 
+
+* [ReqID:14] It shall be possible to store log files from the system in an SD Card. 
+* [ReqID:15] It shall be possible to store every change and log in the system.
+* [ReqID:16] It shall possible to synchronize date and time using an NTP server with the logs.
+
 
 
