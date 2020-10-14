@@ -63,9 +63,12 @@ list and read the logged files, control, configure and calibrate the system.
 
 ## SD Card 
 
-* [ReqID:14] It shall be possible to store log files from the system in an SD Card. 
-* [ReqID:15] It shall be possible to store every change and log in the system.
-* [ReqID:16] It shall possible to synchronize date and time using an NTP server with the logs.
+* [ReqID:14] The teensy should have an SD card.
+* [ReqID:15] An SD driver should be implemented.
+* [ReqID:16] There shall be a sd_init function.
+* [ReqID:17] It shall be possible to store log files from the system in an SD Card. 
+* [ReqID:18] It shall be possible to store every change and log in the system.
+* [ReqID:19] It shall possible to synchronize date and time using an NTP server with the logs.
 
 
 
