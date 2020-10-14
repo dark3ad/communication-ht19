@@ -46,31 +46,37 @@ list and read the logged files, control, configure and calibrate the system.
 * [ReqID:01] It shall be possible to connect an ESP32 to internet via WiFi. 
 * [ReqID:02] An MQTT server/broker should be created. 
 * [ReqID:03] It shall possible then to connect to an MQTT broker. 
-* [ReqID:04] It shall be possible to create variables for every signal/sensor in the MQTT broker.
-* [ReqID:05] It shall be possible to create variables for actuators, configurating and calibrating in the system.
-* [ReqID:06] It shall be possible to publish sensor values to their variables in the broker periodacally (1000ms)
-* [ReqID:07] It shall be possible to subscribe values or control the systems actuators from the MQTT broker. 
-* [ReqID:08] It shall be possible to configure and calibrate values from the MQTT broker.
+* [ReqID:04] It shall be possible to create a list topics for every signal/sensor in the MQTT broker automatically with help of python.
+* [ReqID:05] It shall be possible to create values for actuators, configurating and calibrating in the system.
+* [ReqID:06] It shall be possible to publish all the signals, acuators, everything to their variables in the broker periodacally (1000ms)
+* [ReqID:07] It shall be possible to subscribe and overwrite states and calibration values from the MQTT broker. 
+* [ReqID:08] It shall be possible to initialize the commucation to teensy by I2C.
+* [ReqID:09] It shall be possbile to read date and time from NTP and distribute the datetime to the Teensy.
 * Overall it should be possible to monitor and control everything over the MQTT server.
 
 ## Terminal
 
-* [ReqID:09] It shall possible to have a terminal menu.
-* [ReqID:10] The menu shall have an option to view snapshots of the system. 
-* [ReqID:11] The menu shall have an option to control the systems actuators. 
-* [ReqID:12] The menu shall have an option to calibrate and configure the systems values. 
-* [ReqID:13] It shall be possible to fetch log files from SD card using a sd driver. 
+* [ReqID:10] It shall possible to have a terminal application and a menu system.
+* [ReqID:11] The menu shall have an option to view snapshots of the system. 
+* [ReqID:12] The menu shall have an option to control, overwrite the states and calibration values. 
+* [ReqID:13] It shall be possible to list and handle log files from SD card using a sd driver. 
+
+## Log Manager
+
+* [ReqID:14] Create an application log manager. 
+* [ReqID:15] There shall be a log rotation (to remove old files).
+* [ReqID:16] It shall be possible to log only changes in a log file.
 
 ## SD Card 
 
-* [ReqID:14] Create an application log manager. 
-* [ReqID:15] The teensy should have an SD card.
-* [ReqID:16] An SD driver should be implemented.
-* [ReqID:17] There shall be a init function.
-* [ReqID:18] Should be able to check free memore in the sd card. 
-* [ReqID:19] There shall be a create files function. 
-* [ReqID:20] There shall be a write file function.
-* [ReqID:21] There shall be an edit file function.
-* [ReqID:22] There shall be an list files function. 
-* [ReqID:23] THere shall be a clear file function. 
-* [ReqID:24] THere shall be a delete files function. 
+* [ReqID:16] The teensy should have an SD card.
+* [ReqID:17] It shall be possible to initialize the SD card and status function.
+* [ReqID:18] There shall be a init function.
+* [ReqID:19] Should be able to check free memory in the sd card. 
+* [ReqID:20] There shall be a create files function. 
+* [ReqID:21] There shall be a write file function.
+* [ReqID:22] There shall be an edit file function.
+* [ReqID:23] There shall be an list files function. 
+* [ReqID:24] There shall be a delete files function.
+* [ReqID:25] It shall be possible to set the date and time of the log files.
+* [ReqID:26] It shall be possible to store <amount_of_files>.
