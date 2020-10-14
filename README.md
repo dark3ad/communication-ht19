@@ -59,16 +59,18 @@ list and read the logged files, control, configure and calibrate the system.
 * [ReqID:10] The menu shall have an option to view snapshots of the system. 
 * [ReqID:11] The menu shall have an option to control the systems actuators. 
 * [ReqID:12] The menu shall have an option to calibrate and configure the systems values. 
-* [ReqID:13] It shall be possible to fetch log files from SD Card. 
+* [ReqID:13] It shall be possible to fetch log files from SD card using a sd driver. 
 
 ## SD Card 
 
-* [ReqID:14] The teensy should have an SD card.
-* [ReqID:15] An SD driver should be implemented.
-* [ReqID:16] There shall be a sd_init function.
-* [ReqID:17] It shall be possible to store log files from the system in an SD Card. 
-* [ReqID:18] It shall be possible to store every change and log in the system.
-* [ReqID:19] It shall possible to synchronize date and time using an NTP server with the logs.
-
-
-
+* [ReqID:14] Create an application log manager. 
+* [ReqID:15] The teensy should have an SD card.
+* [ReqID:16] An SD driver should be implemented.
+* [ReqID:17] There shall be a init function.
+* [ReqID:18] Should be able to check free memore in the sd card. 
+* [ReqID:19] There shall be a create files function. 
+* [ReqID:20] There shall be a write file function.
+* [ReqID:21] There shall be an edit file function.
+* [ReqID:22] There shall be an list files function. 
+* [ReqID:23] THere shall be a clear file function. 
+* [ReqID:24] THere shall be a delete files function. 
