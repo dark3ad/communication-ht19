@@ -31,7 +31,7 @@ These requirements are defined according to these criteras:
 
 ### Defined Requirements:
 
-## MQTT                   ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
+## MQTT
 
 * [ReqID:01] It shall be possible to connect an ESP32 to internet via WiFi.
 * [ReqID:02] An MQTT cloud server/broker should be created. 
@@ -43,13 +43,13 @@ These requirements are defined according to these criteras:
 * [ReqID:08] It shall be possible to initialise the module.
 * [ReqID:09] It shall be possible to send the status of the module over canbus. <esp32_status>
 
-## NTP                  ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
+## NTP
 
 * [ReqID:10] It shall be possbile to read date and time from ESP32 via NTP and send it over I2C to Teensy and then forward it to the CAN-bus.
 * [ReqID:11] It shall be possible to initialise the RTC of teensy and then forward it to the CAN-bus. <ntp_status>
 * [ReqID:12] It shall be possible to initialise the module.
 
-## Terminal                  ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
+## Terminal
 
 * [ReqID:13] It shall possible to have a terminal application and a menu system.
 * [ReqID:14] The menu shall have an option to view snapshots of the system.
@@ -58,7 +58,7 @@ These requirements are defined according to these criteras:
 * [ReqID:17] It shall be possible to initialise the module.
 * [ReqID:18] It shall be possible to send the status of the terminal <terminal_status> to the CAN-BUS every (1000ms).
 
-## Log Manager                  ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
+## Log Manager
 
 * [ReqID:19] It shall be possible to have an application log manager. 
 * [ReqID:20] It shall be possible to have a date-depent log rotation routine.
@@ -69,7 +69,7 @@ These requirements are defined according to these criteras:
 * [ReqID:25] It shall be possible to write internal errors of the log manager to a specific file <error.log>
 * [ReqID:26] It shall be possible to turn the buildin led on when there is a critical error.
 
-## SD Card                   ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
+## SD Card
 
 * [ReqID:27] The teensy should have an 2GB SD card.
 * [ReqID:28] It shall be possible to initialize the SD card and status.
