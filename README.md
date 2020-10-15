@@ -39,47 +39,44 @@ These requirements are defined according to these criteras:
 * [ReqID:04] It shall be possible to create a list topics for every signal/sensor in the MQTT client automatically with help of python.
 * [ReqID:05] It shall be possible to get all the data from Teensy by the system.
 * [ReqID:06] It shall be possible to publish all the signals, acuators, everything to their variables in the loud server/broker periodacally (1000ms).
-*REMOVE* [ReqID:07] It shall be possible to subscribe and overwrite states and calibration values from the MQTT broker. 
-* [ReqID:08] It shall be possible commucate between ESP32 and Teensy over I2C.
-* [ReqID:27] It shall be possible to initialise the module.
-* [ReqID:28] It shall be possible to send the status of the module over canbus. <esp32_status>
+* [ReqID:07] It shall be possible commucate between ESP32 and Teensy over I2C.
+* [ReqID:08] It shall be possible to initialise the module.
+* [ReqID:09] It shall be possible to send the status of the module over canbus. <esp32_status>
 
 ## NTP                  ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
 
-* [ReqID:09] It shall be possbile to read date and time from ESP32 via NTP and send it over I2C to Teensy and then forward it to the CAN-bus.
-* [ReqID:28] It shall be possible to initialise the RTC of teensy and then forward it to the CAN-bus. <ntp_status>
-* [ReqID:27] It shall be possible to initialise the module.
+* [ReqID:10] It shall be possbile to read date and time from ESP32 via NTP and send it over I2C to Teensy and then forward it to the CAN-bus.
+* [ReqID:11] It shall be possible to initialise the RTC of teensy and then forward it to the CAN-bus. <ntp_status>
+* [ReqID:12] It shall be possible to initialise the module.
 
 ## Terminal                  ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
 
-* [ReqID:10] It shall possible to have a terminal application and a menu system.
-* [ReqID:11] The menu shall have an option to view snapshots of the system.
-* [ReqID:12] The menu shall have an option to overwrite the states of actuactors and all the calibration values. 
-* [ReqID:13] It shall be possible to list and handle log files from SD card using a SD driver. 
-* [ReqID:27] It shall be possible to initialise the module.
-* [ReqID:29] It shall be possible to send the status of the terminal <terminal_status> to the CAN-BUS every (1000ms).
+* [ReqID:13] It shall possible to have a terminal application and a menu system.
+* [ReqID:14] The menu shall have an option to view snapshots of the system.
+* [ReqID:15] The menu shall have an option to overwrite the states of actuactors and all the calibration values. 
+* [ReqID:16] It shall be possible to list and handle log files from SD card using a SD driver. 
+* [ReqID:17] It shall be possible to initialise the module.
+* [ReqID:18] It shall be possible to send the status of the terminal <terminal_status> to the CAN-BUS every (1000ms).
 
 ## Log Manager                  ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
 
-* [ReqID:14] It shall be possible to have an application log manager. 
-* [ReqID:15] It shall be possible to have a date-depent log rotation routine.
-* [ReqID:16] It shall be possible to log only changes in a log file.
-* [ReqID:27] It shall be possible to initialise the module.
-* [ReqID:30] It shall be possible to store the status of the module SD card <sdcard_status> to the CAN-BUS every (1000ms).
-* [ReqID:31] It shall be possible to send the available memory of the SD card <free_mem> to the CAN-BUS every (1000ms).
-* [ReqID:32] It shall be possible to write internal errors of the log manager to a specific file <error.log>
-* [ReqID:33] It shall be possible to turn the buildin led on when there is a critical error.
+* [ReqID:19] It shall be possible to have an application log manager. 
+* [ReqID:20] It shall be possible to have a date-depent log rotation routine.
+* [ReqID:21] It shall be possible to log only changes in a log file.
+* [ReqID:22] It shall be possible to initialise the module.
+* [ReqID:23] It shall be possible to store the status of the module SD card <sdcard_status> to the CAN-BUS every (1000ms).
+* [ReqID:24] It shall be possible to send the available memory of the SD card <free_mem> to the CAN-BUS every (1000ms).
+* [ReqID:25] It shall be possible to write internal errors of the log manager to a specific file <error.log>
+* [ReqID:26] It shall be possible to turn the buildin led on when there is a critical error.
 
 ## SD Card                   ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
 
-* [ReqID:16] The teensy should have an 2GB SD card.
-* [ReqID:17] It shall be possible to initialize the SD card and status.
-*REMOVE* [ReqID:18] There shall be a init function.
-* [ReqID:19] It should be possible to calculate free memory of the sd card. 
-* [ReqID:20] It should be possible to create files function. 
-* [ReqID:21] It should be possible to write file function.
-* [ReqID:22] It should be possible to edit(append) file function.
-* [ReqID:23] It should be possible to sorted list files function. 
-* [ReqID:24] It should be possible to delete files function.
-* [ReqID:25] It should be possible to set the date and time of the log files.
-*REMOVE* [ReqID:26] It shall be possible to store <amount_of_files>.
+* [ReqID:27] The teensy should have an 2GB SD card.
+* [ReqID:28] It shall be possible to initialize the SD card and status.
+* [ReqID:29] It should be possible to calculate free memory of the sd card. 
+* [ReqID:30] It should be possible to create files function. 
+* [ReqID:31] It should be possible to write file function.
+* [ReqID:32] It should be possible to edit(append) file function.
+* [ReqID:33] It should be possible to sorted list files function. 
+* [ReqID:34] It should be possible to delete files function.
+* [ReqID:35] It should be possible to set the date and time of the log files.
