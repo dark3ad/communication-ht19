@@ -23,60 +23,63 @@ These requirements are defined according to these criteras:
 
 ### Customer Requirements:
 
-13.
-It shall be possible to connect the system to the internet via an ESP32
-
-14.
-It shall be possible to synchronize the date and time of the system using an NTP server.
-
-15.
-It shall be possible to monitor, control, configure and calibrate the system via the MQTT protocol and a broker.
-
-16.
-It shall be possible to log all the data/changes of the system on an SD card with a timestamp every second.
-
-17.
-It shall be possible to communicated to the system via a terminal in order to get the snapshot of the system,
-list and read the logged files, control, configure and calibrate the system.
+13. It shall be possible to connect the system to the internet via an ESP32
+14. It shall be possible to synchronize the date and time of the system using an NTP server.
+15. It shall be possible to monitor, control, configure and calibrate the system via the MQTT protocol and a broker.
+16. It shall be possible to log all the data/changes of the system on an SD card with a timestamp every second.
+17. It shall be possible to communicated to the system via a terminal in order to get the snapshot of the system, list and read the logged files, control, configure and calibrate the system.
 
 ### Defined Requirements:
 
-## MQTT
+## MQTT                   ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
 
-* [ReqID:01] It shall be possible to connect an ESP32 to internet via WiFi. 
-* [ReqID:02] An MQTT server/broker should be created. 
-* [ReqID:03] It shall possible then to connect to an MQTT broker. 
-* [ReqID:04] It shall be possible to create a list topics for every signal/sensor in the MQTT broker automatically with help of python.
-* [ReqID:05] It shall be possible to create values for actuators, configurating and calibrating in the system.
-* [ReqID:06] It shall be possible to publish all the signals, acuators, everything to their variables in the broker periodacally (1000ms)
-* [ReqID:07] It shall be possible to subscribe and overwrite states and calibration values from the MQTT broker. 
-* [ReqID:08] It shall be possible to initialize the commucation to teensy by I2C.
-* [ReqID:09] It shall be possbile to read date and time from NTP and distribute the datetime to the Teensy.
-* Overall it should be possible to monitor and control everything over the MQTT server.
+* [ReqID:01] It shall be possible to connect an ESP32 to internet via WiFi.
+* [ReqID:02] An MQTT cloud server/broker should be created. 
+* [ReqID:03] It shall possible then to connect to an MQTT broker.
+* [ReqID:04] It shall be possible to create a list topics for every signal/sensor in the MQTT client automatically with help of python.
+* [ReqID:05] It shall be possible to get all the data from Teensy by the system.
+* [ReqID:06] It shall be possible to publish all the signals, acuators, everything to their variables in the loud server/broker periodacally (1000ms).
+*REMOVE* [ReqID:07] It shall be possible to subscribe and overwrite states and calibration values from the MQTT broker. 
+* [ReqID:08] It shall be possible commucate between ESP32 and Teensy over I2C.
+* [ReqID:27] It shall be possible to initialise the module.
+* [ReqID:28] It shall be possible to send the status of the module over canbus. <esp32_status>
 
-## Terminal
+## NTP                  ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
+
+* [ReqID:09] It shall be possbile to read date and time from ESP32 via NTP and send it over I2C to Teensy and then forward it to the CAN-bus.
+* [ReqID:28] It shall be possible to initialise the RTC of teensy and then forward it to the CAN-bus. <ntp_status>
+* [ReqID:27] It shall be possible to initialise the module.
+
+## Terminal                  ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
 
 * [ReqID:10] It shall possible to have a terminal application and a menu system.
-* [ReqID:11] The menu shall have an option to view snapshots of the system. 
-* [ReqID:12] The menu shall have an option to control, overwrite the states and calibration values. 
-* [ReqID:13] It shall be possible to list and handle log files from SD card using a sd driver. 
+* [ReqID:11] The menu shall have an option to view snapshots of the system.
+* [ReqID:12] The menu shall have an option to overwrite the states of actuactors and all the calibration values. 
+* [ReqID:13] It shall be possible to list and handle log files from SD card using a SD driver. 
+* [ReqID:27] It shall be possible to initialise the module.
+* [ReqID:29] It shall be possible to send the status of the terminal <terminal_status> to the CAN-BUS every (1000ms).
 
-## Log Manager
+## Log Manager                  ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
 
-* [ReqID:14] Create an application log manager. 
-* [ReqID:15] There shall be a log rotation (to remove old files).
+* [ReqID:14] It shall be possible to have an application log manager. 
+* [ReqID:15] It shall be possible to have a date-depent log rotation routine.
 * [ReqID:16] It shall be possible to log only changes in a log file.
+* [ReqID:27] It shall be possible to initialise the module.
+* [ReqID:30] It shall be possible to store the status of the module SD card <sdcard_status> to the CAN-BUS every (1000ms).
+* [ReqID:31] It shall be possible to send the available memory of the SD card <free_mem> to the CAN-BUS every (1000ms).
+* [ReqID:32] It shall be possible to write internal errors of the log manager to a specific file <error.log>
+* [ReqID:33] It shall be possible to turn the buildin led on when there is a critical error.
 
-## SD Card 
+## SD Card                   ******** REWRITE NEW NUMBERS FOR ALL REQUIREMENTS; AS SOME ARE DEPRICATED ***************
 
-* [ReqID:16] The teensy should have an SD card.
-* [ReqID:17] It shall be possible to initialize the SD card and status function.
-* [ReqID:18] There shall be a init function.
-* [ReqID:19] Should be able to check free memory in the sd card. 
-* [ReqID:20] There shall be a create files function. 
-* [ReqID:21] There shall be a write file function.
-* [ReqID:22] There shall be an edit file function.
-* [ReqID:23] There shall be an list files function. 
-* [ReqID:24] There shall be a delete files function.
-* [ReqID:25] It shall be possible to set the date and time of the log files.
-* [ReqID:26] It shall be possible to store <amount_of_files>.
+* [ReqID:16] The teensy should have an 2GB SD card.
+* [ReqID:17] It shall be possible to initialize the SD card and status.
+*REMOVE* [ReqID:18] There shall be a init function.
+* [ReqID:19] It should be possible to calculate free memory of the sd card. 
+* [ReqID:20] It should be possible to create files function. 
+* [ReqID:21] It should be possible to write file function.
+* [ReqID:22] It should be possible to edit(append) file function.
+* [ReqID:23] It should be possible to sorted list files function. 
+* [ReqID:24] It should be possible to delete files function.
+* [ReqID:25] It should be possible to set the date and time of the log files.
+*REMOVE* [ReqID:26] It shall be possible to store <amount_of_files>.
