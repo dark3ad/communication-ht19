@@ -36,10 +36,10 @@ These requirements are defined according to these criteras:
 * [ReqID:01] It shall be possible to connect an ESP32 to internet via WiFi.
 * [ReqID:02] An MQTT cloud server/broker should be created. 
 * [ReqID:03] It shall possible then to connect to an MQTT broker.
-* [ReqID:04] It shall be possible to create a list topics for every signal/sensor in the MQTT client automatically with help of python.
+* [ReqID:04] It shall be possible to create a list topics for every signal in the MQTT client automatically with help of python.
 * [ReqID:05] It shall be possible to get all the data from Teensy by the system.
 * [ReqID:06] It shall be possible to publish all the signals, acuators, everything to their variables in the cloud server/broker periodacally (1000ms).
-* [ReqID:07] It shall be possible commucate between ESP32 and Teensy over I2C.
+* [ReqID:07] It shall be possible communicate between ESP32 and Teensy over I2C.
 * [ReqID:08] It shall be possible to initialise the module.
 * [ReqID:09] It shall be possible to send the status of the module over canbus. <esp32_status>
 
