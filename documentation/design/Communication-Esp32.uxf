@@ -4,16 +4,16 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1161</x>
-      <y>261</y>
+      <x>981</x>
+      <y>207</y>
       <w>234</w>
       <h>153</h>
     </coordinates>
     <panel_attributes>I2C Driver Master
 --
 void initalize()
-int get_status()
-int set_status()
+uint8_t get_status()
+uint8_t set_status()
 --
 Responsibilities
 Establish communcation
@@ -23,16 +23,17 @@ between Teensy and ESP32.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>873</x>
-      <y>261</y>
+      <x>693</x>
+      <y>531</y>
       <w>279</w>
-      <h>153</h>
+      <h>171</h>
     </coordinates>
     <panel_attributes>MQTT Driver
 --
 void initalize()
-int set_status()
-int get_status()
+uint8_t set_status()
+uint8_t get_status()
+uint8_t send_value()
 --
 Responsibilities
 Publish signals to the MQTT Broker.</panel_attributes>
@@ -41,8 +42,8 @@ Publish signals to the MQTT Broker.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>594</x>
-      <y>108</y>
+      <x>702</x>
+      <y>54</y>
       <w>279</w>
       <h>99</h>
     </coordinates>
@@ -57,16 +58,16 @@ Responsibilities
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>297</x>
-      <y>261</y>
+      <x>405</x>
+      <y>207</y>
       <w>279</w>
-      <h>153</h>
+      <h>234</h>
     </coordinates>
     <panel_attributes>NTP Driver
 --
 void initalize()
-int get_status()
-int set_status()
+uint8_t get_status()
+uint8_t set_status()
 --
 Responsibilities
 Fetch date and time from NTP. </panel_attributes>
@@ -75,16 +76,17 @@ Fetch date and time from NTP. </panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>585</x>
-      <y>261</y>
+      <x>693</x>
+      <y>207</y>
       <w>279</w>
-      <h>153</h>
+      <h>234</h>
     </coordinates>
     <panel_attributes>WiFi Driver
 --
 void initalize()
-int set_status()
-int get_status()
+uint8_t set_status()
+uint8_t get_status()
+uint8_t connect()
 --
 Responsibilities
 Establish a connection to internet.</panel_attributes>
@@ -93,16 +95,19 @@ Establish a connection to internet.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>9</x>
-      <y>261</y>
+      <x>117</x>
+      <y>207</y>
       <w>279</w>
-      <h>153</h>
+      <h>234</h>
     </coordinates>
     <panel_attributes>LED Driver
 --
 void initalize()
-int set_status()
-int get_status()
+uint8_t set_status()
+uint8_t get_status()
+uint8_t turn_on()
+uint8_t turn_off()
+
 --
 Responsibilities
 Turn on and off the bultin led.</panel_attributes>
@@ -111,8 +116,8 @@ Turn on and off the bultin led.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1161</x>
-      <y>459</y>
+      <x>981</x>
+      <y>405</y>
       <w>234</w>
       <h>126</h>
     </coordinates>
@@ -127,8 +132,8 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1269</x>
-      <y>405</y>
+      <x>1089</x>
+      <y>351</y>
       <w>27</w>
       <h>72</h>
     </coordinates>
@@ -138,8 +143,8 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>135</x>
-      <y>198</y>
+      <x>243</x>
+      <y>144</y>
       <w>612</w>
       <h>81</h>
     </coordinates>
@@ -149,8 +154,8 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>441</x>
-      <y>216</y>
+      <x>549</x>
+      <y>162</y>
       <w>27</w>
       <h>63</h>
     </coordinates>
@@ -160,8 +165,8 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>720</x>
-      <y>216</y>
+      <x>828</x>
+      <y>162</y>
       <w>27</w>
       <h>63</h>
     </coordinates>
@@ -171,23 +176,23 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>720</x>
-      <y>216</y>
-      <w>576</w>
+      <x>828</x>
+      <y>162</y>
+      <w>288</w>
       <h>63</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>620.0;50.0;620.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>300.0;50.0;300.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1008</x>
-      <y>216</y>
+      <x>828</x>
+      <y>432</y>
       <w>27</w>
-      <h>63</h>
+      <h>117</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;110.0;10.0;10.0</additional_attributes>
   </element>
 </diagram>
