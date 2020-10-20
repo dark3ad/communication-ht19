@@ -29,8 +29,6 @@ Expl. fetched from the other groups.
 1.  <free_mem>     2.  unsigned int    3.  7 bits    4.  0-1    5.  SD-card available memory broadcast to CANbus      6.  No     7.  No      8.  Communication/CAN         9.  Communication/CAN              10. 1000ms
 1.  <log_manager_err>     2.  unsigned int    3.  7 bits    4.  0    5.  Log manager (internal) errors write to specific error.log file      6.  No     7.  No      8.  Communication/CAN         9.  Communication/CAN              10. 1000ms
 1.  <critical_err>     2.  unsigned int    3.  7 bits    4.  0    5.  Critical error detection turns BUILDIN LED on      6.  No     7.  No      8.  Communication/CAN         9.  Communication/CAN              10. 1000ms
-
-#Calibration Values - Sensors
 1.  <set_temperature_min_cal_value>     2.  unsigned int    3.  7 bits  4.  0 - 50 grader celsius   5.  set minimum temperature calibration value to CAN      6.  Yes     7.  Yes      8.  Sensor         9.  HMI/Actuators/Comm              10. 1000ms
     <set_temperature_max_cal_value>         unsigned int        7 bits      0 - 50 grader celsius       set maximum temperature calibration value to CAN          Yes         Yes          Sensor             HMI/Actuators/Comm                  1000ms
     <set_humidity_min_cal_value>            unsigned int        7 bits      0 - 100                     set minimum humidity calibration value to CAN             Yes         Yes          Sensor             HMI/Actuators/Comm                  1000ms
@@ -43,8 +41,6 @@ Expl. fetched from the other groups.
     <set_soil_moisture_max_cal_value>       unsigned int        7 bits      0 - 100                     set maximum soil moisture calibration value to CAN        Yes         Yes          Sensor             HMI/Actuators/Comm                  1000ms
 1.  <set_water_level_min_cal_value>     2.  unsigned int    3.  7 bits  4.  0 - 100                 5.  set minimum water level calibration value to CAN      6.  Yes     7.  Yes      8.  Sensor         9.  HMI/Actuators/Comm              10. 1000ms
     <set_water_level_max_cal_value>         unsigned int        7 bits      0 - 100                     set maximum water level calibration value to CAN          Yes         Yes          Sensor             HMI/Actuators/Comm                  1000ms
-
-#Calibration Values & States - All other node(s)
 1.  <set_light_intensity_min_cal_value>     2.  unsigned int    3.  7 bits  4.  0 - 100   5.  set minimum light intensity calibration value to CAN      6.  Yes     7.  Yes      8.  Actuators         9.  HMI/Actuators/Comm              10. 1000ms
 1.  <set_light_intensity_max_cal_value>     2.  unsigned int    3.  7 bits  4.  0 - 100   5.  set maximum light intensity calibration value to CAN      6.  Yes     7.  Yes      8.  Actuators         9.  HMI/Actuators/Comm              10. 1000ms
 1.  <set_lamp_status>     2.  unsigned int    3.  7 bits  4.  0 - 1   5.  set status of lamp ON(0), OFF(1) value to CAN      6.  Yes     7.  Yes      8.  Actuators         9.  HMI/Actuators/Comm              10. 1000ms
