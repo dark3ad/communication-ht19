@@ -4,10 +4,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>864</x>
-      <y>369</y>
+      <x>855</x>
+      <y>333</y>
       <w>279</w>
-      <h>153</h>
+      <h>288</h>
     </coordinates>
     <panel_attributes>Terminal Application
 --
@@ -15,6 +15,15 @@ void initalize()
 uint8_t get_status()
 uint8_t set_status()
 void menu()
+void list_files()
+void remove_file(file)
+void read_file(file)
+void list_actuators()
+void list_sensors()
+void read_actuator(actuator)
+void edit_actuator(actuator, value, unit)
+void calibrate_actuator(actuator)
+void read_sensor(char sensor)
 --
 Responsibilities
 Interface to reach logs, configura
@@ -24,10 +33,10 @@ signals and calibrate acuators.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>567</x>
-      <y>369</y>
+      <x>558</x>
+      <y>333</y>
       <w>279</w>
-      <h>153</h>
+      <h>288</h>
     </coordinates>
     <panel_attributes>Log Manager
 --
@@ -35,6 +44,7 @@ void initalize()
 uint8_t get_status()
 uint8_t set_status()
 void rotate()
+void write_log()
 --
 Responsibilities
 A unit that writes log files.</panel_attributes>
@@ -43,8 +53,8 @@ A unit that writes log files.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1152</x>
-      <y>369</y>
+      <x>1143</x>
+      <y>333</y>
       <w>234</w>
       <h>45</h>
     </coordinates>
@@ -57,8 +67,8 @@ This is a placeholder
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>720</x>
-      <y>108</y>
+      <x>711</x>
+      <y>72</y>
       <w>279</w>
       <h>207</h>
     </coordinates>
@@ -74,10 +84,10 @@ all it's modules.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>720</x>
-      <y>576</y>
+      <x>711</x>
+      <y>702</y>
       <w>270</w>
-      <h>261</h>
+      <h>225</h>
     </coordinates>
     <panel_attributes>SD Driver
 --
@@ -100,10 +110,10 @@ Handles the files.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>315</x>
-      <y>369</y>
+      <x>306</x>
+      <y>333</y>
       <w>234</w>
-      <h>198</h>
+      <h>234</h>
     </coordinates>
     <panel_attributes>I2C Driver Slave
 --
@@ -119,38 +129,10 @@ between Teensy and ESP32.</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>315</x>
-      <y>612</y>
-      <w>234</w>
-      <h>126</h>
-    </coordinates>
-    <panel_attributes>Utility
---
-uint8_t pack_message()
-uint8_t unpack_message()
---
-Responsibilities
-Read and pack messages.</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
     <id>Relation</id>
     <coordinates>
-      <x>423</x>
-      <y>558</y>
-      <w>27</w>
-      <h>72</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>423</x>
-      <y>306</y>
+      <x>414</x>
+      <y>270</y>
       <w>450</w>
       <h>81</h>
     </coordinates>
@@ -160,8 +142,8 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>693</x>
-      <y>324</y>
+      <x>684</x>
+      <y>288</y>
       <w>27</w>
       <h>63</h>
     </coordinates>
@@ -171,8 +153,8 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>846</x>
-      <y>324</y>
+      <x>837</x>
+      <y>288</y>
       <w>171</w>
       <h>63</h>
     </coordinates>
@@ -182,8 +164,8 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>990</x>
-      <y>324</y>
+      <x>981</x>
+      <y>288</y>
       <w>297</w>
       <h>63</h>
     </coordinates>
@@ -193,58 +175,42 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>693</x>
-      <y>513</y>
+      <x>684</x>
+      <y>612</y>
       <w>180</w>
-      <h>81</h>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
-    <additional_attributes>180.0;70.0;180.0;30.0;10.0;30.0;10.0;10.0</additional_attributes>
+    <additional_attributes>180.0;100.0;180.0;60.0;10.0;60.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>846</x>
-      <y>513</y>
+      <x>837</x>
+      <y>612</y>
       <w>180</w>
-      <h>45</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>180.0;10.0;180.0;30.0;10.0;30.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>1260</x>
-      <y>405</y>
-      <w>27</w>
       <h>72</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
+    <additional_attributes>180.0;10.0;180.0;60.0;10.0;60.0</additional_attributes>
   </element>
   <element>
-    <id>UMLClass</id>
+    <id>Relation</id>
     <coordinates>
-      <x>1152</x>
-      <y>459</y>
-      <w>234</w>
-      <h>126</h>
-    </coordinates>
-    <panel_attributes>Utility
---
-
---
-Responsibilities
-Read and pack messages.</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>18</x>
+      <x>1251</x>
       <y>369</y>
-      <w>279</w>
+      <w>27</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>63</x>
+      <y>333</y>
+      <w>225</w>
       <h>234</h>
     </coordinates>
     <panel_attributes>LED Driver
@@ -263,12 +229,48 @@ Turn on and off the bultin led.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>144</x>
-      <y>324</y>
-      <w>306</w>
+      <x>189</x>
+      <y>288</y>
+      <w>252</w>
       <h>63</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;50.0;10.0;10.0;320.0;10.0;190.0;10.0;320.0;10.0</additional_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0;260.0;10.0;130.0;10.0;260.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1143</x>
+      <y>414</y>
+      <w>234</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>Utility
+--
+Responsibilities
+Read and pack messages.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>306</x>
+      <y>630</y>
+      <w>234</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>ESP32</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>414</x>
+      <y>558</y>
+      <w>27</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
   </element>
 </diagram>

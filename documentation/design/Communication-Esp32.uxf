@@ -14,6 +14,8 @@
 void initalize()
 uint8_t get_status()
 uint8_t set_status()
+void read()
+void send()
 --
 Responsibilities
 Establish communcation
@@ -23,8 +25,8 @@ between Teensy and ESP32.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>684</x>
-      <y>567</y>
+      <x>837</x>
+      <y>549</y>
       <w>279</w>
       <h>171</h>
     </coordinates>
@@ -58,8 +60,8 @@ Responsibilities
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>396</x>
-      <y>243</y>
+      <x>540</x>
+      <y>549</y>
       <w>279</w>
       <h>234</h>
     </coordinates>
@@ -95,7 +97,7 @@ Establish a connection to internet.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>108</x>
+      <x>387</x>
       <y>243</y>
       <w>279</w>
       <h>234</h>
@@ -114,53 +116,26 @@ Turn on and off the bultin led.</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>972</x>
-      <y>441</y>
-      <w>234</w>
-      <h>126</h>
-    </coordinates>
-    <panel_attributes>Utility
---
-
---
-Responsibilities
-Read and pack messages.</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
     <id>Relation</id>
     <coordinates>
-      <x>1080</x>
-      <y>387</y>
-      <w>27</w>
-      <h>72</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>234</x>
+      <x>513</x>
       <y>180</y>
-      <w>612</w>
+      <w>333</w>
       <h>81</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;70.0;10.0;30.0;660.0;30.0;660.0;10.0</additional_attributes>
+    <additional_attributes>10.0;70.0;10.0;30.0;350.0;30.0;350.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>540</x>
-      <y>198</y>
-      <w>27</w>
-      <h>63</h>
+      <x>684</x>
+      <y>468</y>
+      <w>162</w>
+      <h>99</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;90.0;10.0;50.0;160.0;50.0;160.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -189,10 +164,10 @@ Read and pack messages.</panel_attributes>
     <coordinates>
       <x>819</x>
       <y>468</y>
-      <w>27</w>
-      <h>117</h>
+      <w>180</w>
+      <h>99</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;110.0;10.0;10.0</additional_attributes>
+    <additional_attributes>180.0;90.0;180.0;50.0;10.0;50.0;10.0;10.0</additional_attributes>
   </element>
 </diagram>
