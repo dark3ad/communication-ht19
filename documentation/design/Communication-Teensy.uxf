@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.3">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>855</x>
+      <y>333</y>
+      <w>279</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>Terminal Application
+--
+void initalize()
+uint8_t get_status()
+uint8_t set_status()
+void menu()
+void list_files()
+void remove_file(file)
+void read_file(file)
+void list_actuators()
+void list_sensors()
+void read_actuator(actuator)
+void edit_actuator(actuator, value, unit)
+void calibrate_actuator(actuator)
+void read_sensor(char sensor)
+--
+Responsibilities
+Interface to reach logs, configura
+signals and calibrate acuators.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>558</x>
+      <y>333</y>
+      <w>279</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>Log Manager
+--
+void initalize()
+uint8_t get_status()
+uint8_t set_status()
+void rotate()
+void write_log()
+--
+Responsibilities
+A unit that writes log files.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1143</x>
+      <y>333</y>
+      <w>234</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>CAN Driver
+--
+This is a placeholder
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>711</x>
+      <y>72</y>
+      <w>279</w>
+      <h>207</h>
+    </coordinates>
+    <panel_attributes>Teensy
+--
+void initalize()
+--
+Responsibilities
+This application initializes and handles
+all it's modules.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>711</x>
+      <y>702</y>
+      <w>270</w>
+      <h>225</h>
+    </coordinates>
+    <panel_attributes>SD Driver
+--
+void initalize()
+uint8_t get_status()
+uint8_t set_status()
+void create_file()
+void write_file()
+void read_file()
+void remove_file()
+void edit_file()
+void free_space()
+void print_sorted_list()
+void date_time_log_files(ntp)
+--
+Responsibilities
+Handles the files.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>306</x>
+      <y>333</y>
+      <w>234</w>
+      <h>234</h>
+    </coordinates>
+    <panel_attributes>I2C Driver Slave
+--
+void initalize()
+uint8_t get_status()
+uint8_t set_status()
+void send()
+void read()
+--
+Responsibilities
+Establish communcation
+between Teensy and ESP32.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>414</x>
+      <y>270</y>
+      <w>450</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;30.0;480.0;30.0;480.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>684</x>
+      <y>288</y>
+      <w>27</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>837</x>
+      <y>288</y>
+      <w>171</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>170.0;50.0;170.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>981</x>
+      <y>288</y>
+      <w>297</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>310.0;50.0;310.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>684</x>
+      <y>612</y>
+      <w>180</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>180.0;100.0;180.0;60.0;10.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>837</x>
+      <y>612</y>
+      <w>180</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>180.0;10.0;180.0;60.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1251</x>
+      <y>369</y>
+      <w>27</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>63</x>
+      <y>333</y>
+      <w>225</w>
+      <h>234</h>
+    </coordinates>
+    <panel_attributes>LED Driver
+--
+void initalize()
+uint8_t set_status()
+uint8_t get_status()
+uint8_t turn_on()
+uint8_t turn_off()
+
+--
+Responsibilities
+Turn on and off the bultin led.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>189</x>
+      <y>288</y>
+      <w>252</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0;260.0;10.0;130.0;10.0;260.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1143</x>
+      <y>414</y>
+      <w>234</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>Utility
+--
+Responsibilities
+Read and pack messages.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>306</x>
+      <y>630</y>
+      <w>234</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>ESP32</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>414</x>
+      <y>558</y>
+      <w>27</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>
