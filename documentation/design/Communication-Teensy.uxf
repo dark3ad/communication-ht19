@@ -4,8 +4,8 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>855</x>
-      <y>333</y>
+      <x>657</x>
+      <y>81</y>
       <w>279</w>
       <h>288</h>
     </coordinates>
@@ -33,9 +33,9 @@ signals and calibrate acuators.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>558</x>
-      <y>333</y>
-      <w>279</w>
+      <x>405</x>
+      <y>81</y>
+      <w>234</w>
       <h>288</h>
     </coordinates>
     <panel_attributes>Log Manager
@@ -53,8 +53,8 @@ A unit that writes log files.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1143</x>
-      <y>333</y>
+      <x>1026</x>
+      <y>612</y>
       <w>234</w>
       <h>45</h>
     </coordinates>
@@ -67,10 +67,10 @@ This is a placeholder
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>711</x>
-      <y>72</y>
+      <x>639</x>
+      <y>720</y>
       <w>279</w>
-      <h>207</h>
+      <h>117</h>
     </coordinates>
     <panel_attributes>Teensy
 --
@@ -84,10 +84,10 @@ all it's modules.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>711</x>
-      <y>702</y>
-      <w>270</w>
-      <h>225</h>
+      <x>513</x>
+      <y>423</y>
+      <w>261</w>
+      <h>234</h>
     </coordinates>
     <panel_attributes>SD Driver
 --
@@ -110,8 +110,8 @@ Handles the files.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>306</x>
-      <y>333</y>
+      <x>783</x>
+      <y>423</y>
       <w>234</w>
       <h>234</h>
     </coordinates>
@@ -129,89 +129,12 @@ between Teensy and ESP32.</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>414</x>
-      <y>270</y>
-      <w>450</w>
-      <h>81</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;70.0;10.0;30.0;480.0;30.0;480.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>684</x>
-      <y>288</y>
-      <w>27</w>
-      <h>63</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>837</x>
-      <y>288</y>
-      <w>171</w>
-      <h>63</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>170.0;50.0;170.0;10.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>981</x>
-      <y>288</y>
-      <w>297</w>
-      <h>63</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>310.0;50.0;310.0;10.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>684</x>
-      <y>612</y>
-      <w>180</w>
-      <h>108</h>
-    </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
-    <additional_attributes>180.0;100.0;180.0;60.0;10.0;60.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>837</x>
-      <y>612</y>
-      <w>180</w>
-      <h>72</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>180.0;10.0;180.0;60.0;10.0;60.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>1251</x>
-      <y>369</y>
-      <w>27</w>
-      <h>63</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>63</x>
-      <y>333</y>
+      <x>162</x>
+      <y>81</y>
       <w>225</w>
-      <h>234</h>
+      <h>288</h>
     </coordinates>
     <panel_attributes>LED Driver
 --
@@ -227,23 +150,12 @@ Turn on and off the bultin led.</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>189</x>
-      <y>288</y>
-      <w>252</w>
-      <h>63</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;50.0;10.0;10.0;260.0;10.0;130.0;10.0;260.0;10.0</additional_attributes>
-  </element>
-  <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1143</x>
-      <y>414</y>
+      <x>1026</x>
+      <y>504</y>
       <w>234</w>
-      <h>90</h>
+      <h>72</h>
     </coordinates>
     <panel_attributes>Utility
 --
@@ -254,8 +166,8 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>306</x>
-      <y>630</y>
+      <x>972</x>
+      <y>342</y>
       <w>234</w>
       <h>27</h>
     </coordinates>
@@ -265,12 +177,89 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>414</x>
-      <y>558</y>
+      <x>252</x>
+      <y>360</y>
+      <w>414</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0;440.0;40.0;440.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>504</x>
+      <y>360</y>
       <w>27</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>639</x>
+      <y>360</y>
+      <w>189</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>190.0;10.0;190.0;40.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>360</y>
+      <w>207</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>210.0;10.0;210.0;40.0;10.0;40.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>648</y>
+      <w>171</w>
       <h>90</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;</panel_attributes>
-    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0;170.0;50.0;170.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>774</x>
+      <y>648</y>
+      <w>153</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>150.0;10.0;150.0;50.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>648</y>
+      <w>261</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>270.0;10.0;270.0;50.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1134</x>
+      <y>567</y>
+      <w>27</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
   </element>
 </diagram>
