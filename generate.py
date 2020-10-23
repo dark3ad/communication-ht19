@@ -5,11 +5,11 @@ node = 'com'
 mode = 'development'
 
 def print_error():
-        print("\nError...")
-        print('Usage: The available flag and arguments')
-        print('1) python generate.py')
-        print('2) python generate.py -mode production')
-        print('3) python generate.py -mode development')
+    print("\nError...")
+    print('Usage: The available flag and arguments')
+    print('1) python generate.py')
+    print('2) python generate.py -mode production')
+    print('3) python generate.py -mode development')
 
 if len(sys.argv) == 3 or len(sys.argv) == 4:
     if sys.argv[1] != '-mode':
@@ -24,7 +24,7 @@ elif len(sys.argv) != 1:
 
 os.system('git submodule init')
 os.system('git submodule update')
-os.system('cd canbus && git checkout master && git pull')
+os.system('cd canbus && git checkout develop && git pull')
 
 os.system('cd canbus && python canbus.py -node {0} -mode {1}'.format(node, mode))
 print('The CAN interface was generated in the {0} mode'.format(mode.upper()))
