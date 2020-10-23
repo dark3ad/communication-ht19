@@ -22,9 +22,13 @@ elif len(sys.argv) != 1:
     print_error()
     exit(3)
 
+branch = 'develop'
+if mode == 'production':
+    branch = 'master'
+
 os.system('git submodule init')
 os.system('git submodule update')
-os.system('cd canbus && git checkout develop && git pull')
+os.system('cd canbus && git checkout {0} && git pull'.format(branch))
 
 os.system('cd canbus && python canbus.py -node {0} -mode {1}'.format(node, mode))
 print('The CAN interface was generated in the {0} mode'.format(mode.upper()))
