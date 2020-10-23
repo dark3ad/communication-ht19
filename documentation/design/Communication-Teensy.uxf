@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.3">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>657</x>
+      <y>171</y>
+      <w>279</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>Terminal Application
+--
+void initalize()
+uint8_t get_status()
+uint8_t set_status()
+void menu()
+void list_files()
+void remove_file(file)
+void read_file(file)
+void list_actuators()
+void list_sensors()
+void read_actuator(actuator)
+void edit_actuator(actuator, value, unit)
+void calibrate_actuator(actuator)
+void read_sensor(char sensor)
+--
+Responsibilities
+Interface to reach logs, configura
+signals and calibrate acuators.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>405</x>
+      <y>171</y>
+      <w>234</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>Log Manager
+--
+void initalize()
+uint8_t get_status()
+uint8_t set_status()
+void rotate()
+void write_log()
+--
+Responsibilities
+A unit that writes log files.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>918</x>
+      <y>540</y>
+      <w>135</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>CAN Bus
+--
+Used by the 
+Terminal &amp;
+Log Manager.
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>513</x>
+      <y>540</y>
+      <w>198</w>
+      <h>234</h>
+    </coordinates>
+    <panel_attributes>SD Driver
+--
+void initalize()
+uint8_t get_status()
+void create_file()
+void write_file()
+void read_file()
+void remove_file()
+void edit_file()
+void free_space()
+void print_sorted_list()
+void date_time_log_files(ntp)
+--
+Responsibilities
+Handles the files.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>720</x>
+      <y>540</y>
+      <w>189</w>
+      <h>234</h>
+    </coordinates>
+    <panel_attributes>I2C Driver Slave
+--
+void initalize()
+uint8_t get_status()
+void send()
+void read()
+--
+Responsibilities
+Establish communcation
+between Teensy and ESP32.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>270</x>
+      <y>540</y>
+      <w>225</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>LED Driver
+--
+void initalize()
+uint8_t get_status()
+uint8_t turn_on()
+uint8_t turn_off()
+
+--
+Responsibilities
+Turn on and off the bultin led.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1062</x>
+      <y>432</y>
+      <w>126</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>ESP32</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>378</x>
+      <y>504</y>
+      <w>108</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0;100.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>459</x>
+      <y>450</y>
+      <w>27</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>450</y>
+      <w>198</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>200.0;10.0;200.0;60.0;10.0;60.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>873</x>
+      <y>450</y>
+      <w>261</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>270.0;10.0;270.0;70.0;10.0;70.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1098</x>
+      <y>540</y>
+      <w>135</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>UART
+--
+Used by Terminal.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>450</y>
+      <w>27</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0;10.0;40.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>801</x>
+      <y>495</y>
+      <w>216</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>220.0;50.0;220.0;10.0;10.0;10.0;100.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>450</y>
+      <w>414</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0;440.0;80.0;440.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>855</x>
+      <y>450</y>
+      <w>324</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0;340.0;50.0;340.0;100.0</additional_attributes>
+  </element>
+</diagram>
