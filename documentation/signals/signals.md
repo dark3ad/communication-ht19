@@ -17,8 +17,8 @@ Follow these steps when defining the signals.
 Expl. fetched from the other groups.
 
 ## Output
-| Driver | Signal name  | Signal type  | Length of signal  | value range  | short description  | Calibration val?  | overwrite signal?  | setters  | getters  | how often  |
-|---|---|---|---|---|---|---|---|---|---|---|
+| Signal name  | Signal type  | Length of signal  | value range  | short description  | Calibration val?  | overwrite signal?  | setters  | getters  | how often  |
+|---|---|---|---|---|---|---|---|---|---|
 | <wifi_status>                       | unsigned int | 7 bits | 0 - 3                 | wifi status connected(0),disconnected(1),connection_failed(2),connecting(3) values from ESP32  | No  | No  | Communication/CAN | Communication/CAN  | 1000ms |
 | <mqtt_status>                       | unsigned int | 7 bits | 0 - 3                 | mqtt status connected(0),disconnected(1),connection_failed(2),connecting(3) values from broker | No  | No  | Communication/CAN | Communication/CAN  | 1000ms |
 | <i2c_status>                        | unsigned int | 7 bits | 0 - 3                 | i2c status connected(0),disconnected(1),connection_failed(2),connecting(3) values from ESP32   | No  | No  | Communication/CAN | Communication/CAN  | 1000ms |
