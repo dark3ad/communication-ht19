@@ -5,7 +5,7 @@
     <id>UMLClass</id>
     <coordinates>
       <x>657</x>
-      <y>81</y>
+      <y>171</y>
       <w>279</w>
       <h>288</h>
     </coordinates>
@@ -34,7 +34,7 @@ signals and calibrate acuators.</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>405</x>
-      <y>81</y>
+      <y>171</y>
       <w>234</w>
       <h>288</h>
     </coordinates>
@@ -53,47 +53,31 @@ A unit that writes log files.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1026</x>
-      <y>612</y>
-      <w>234</w>
-      <h>45</h>
+      <x>918</x>
+      <y>540</y>
+      <w>135</w>
+      <h>72</h>
     </coordinates>
-    <panel_attributes>CAN Driver
+    <panel_attributes>CAN Bus
 --
-This is a placeholder
+Used by the 
+Terminal &amp;
+Log Manager.
 </panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>639</x>
-      <y>720</y>
-      <w>279</w>
-      <h>117</h>
-    </coordinates>
-    <panel_attributes>Teensy
---
-void initalize()
---
-Responsibilities
-This application initializes and handles
-all it's modules.</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
       <x>513</x>
-      <y>423</y>
-      <w>261</w>
+      <y>540</y>
+      <w>198</w>
       <h>234</h>
     </coordinates>
     <panel_attributes>SD Driver
 --
 void initalize()
 uint8_t get_status()
-uint8_t set_status()
 void create_file()
 void write_file()
 void read_file()
@@ -110,16 +94,15 @@ Handles the files.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>783</x>
-      <y>423</y>
-      <w>234</w>
+      <x>720</x>
+      <y>540</y>
+      <w>189</w>
       <h>234</h>
     </coordinates>
     <panel_attributes>I2C Driver Slave
 --
 void initalize()
 uint8_t get_status()
-uint8_t set_status()
 void send()
 void read()
 --
@@ -131,15 +114,14 @@ between Teensy and ESP32.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>162</x>
-      <y>81</y>
+      <x>270</x>
+      <y>540</y>
       <w>225</w>
-      <h>288</h>
+      <h>153</h>
     </coordinates>
     <panel_attributes>LED Driver
 --
 void initalize()
-uint8_t set_status()
 uint8_t get_status()
 uint8_t turn_on()
 uint8_t turn_off()
@@ -152,23 +134,9 @@ Turn on and off the bultin led.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1026</x>
-      <y>504</y>
-      <w>234</w>
-      <h>72</h>
-    </coordinates>
-    <panel_attributes>Utility
---
-Responsibilities
-Read and pack messages.</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>972</x>
-      <y>342</y>
-      <w>234</w>
+      <x>1062</x>
+      <y>432</y>
+      <w>126</w>
       <h>27</h>
     </coordinates>
     <panel_attributes>ESP32</panel_attributes>
@@ -177,89 +145,102 @@ Read and pack messages.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>252</x>
-      <y>360</y>
-      <w>414</w>
-      <h>81</h>
+      <x>378</x>
+      <y>504</y>
+      <w>108</w>
+      <h>54</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;40.0;440.0;40.0;440.0;70.0</additional_attributes>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0;100.0;10.0;90.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>504</x>
-      <y>360</y>
+      <x>459</x>
+      <y>450</y>
       <w>27</w>
-      <h>54</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>639</x>
-      <y>360</y>
-      <w>189</w>
-      <h>54</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>190.0;10.0;190.0;40.0;10.0;40.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>900</x>
-      <y>360</y>
-      <w>207</w>
       <h>81</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>210.0;10.0;210.0;40.0;10.0;40.0;10.0;70.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>630</x>
-      <y>648</y>
-      <w>171</w>
-      <h>90</h>
+      <y>450</y>
+      <w>198</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;50.0;170.0;50.0;170.0;80.0</additional_attributes>
+    <additional_attributes>200.0;10.0;200.0;60.0;10.0;60.0;10.0;100.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>774</x>
-      <y>648</y>
-      <w>153</w>
-      <h>63</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>150.0;10.0;150.0;50.0;10.0;50.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>900</x>
-      <y>648</y>
+      <x>873</x>
+      <y>450</y>
       <w>261</w>
-      <h>63</h>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>270.0;10.0;270.0;50.0;10.0;50.0</additional_attributes>
+    <additional_attributes>270.0;10.0;270.0;70.0;10.0;70.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1098</x>
+      <y>540</y>
+      <w>135</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>UART
+--
+Used by Terminal.</panel_attributes>
+    <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1134</x>
-      <y>567</y>
+      <x>540</x>
+      <y>450</y>
       <w>27</w>
-      <h>63</h>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0;10.0;40.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>801</x>
+      <y>495</y>
+      <w>216</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>220.0;50.0;220.0;10.0;10.0;10.0;100.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>450</y>
+      <w>414</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0;440.0;80.0;440.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>855</x>
+      <y>450</y>
+      <w>324</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0;340.0;50.0;340.0;100.0</additional_attributes>
   </element>
 </diagram>

@@ -4,8 +4,8 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>927</x>
-      <y>396</y>
+      <x>945</x>
+      <y>459</y>
       <w>234</w>
       <h>234</h>
     </coordinates>
@@ -13,7 +13,6 @@
 --
 void initalize()
 uint8_t get_status()
-uint8_t set_status()
 void read()
 void send()
 --
@@ -25,12 +24,12 @@ between Teensy and ESP32.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>801</x>
-      <y>81</y>
+      <x>819</x>
+      <y>144</y>
       <w>279</w>
       <h>234</h>
     </coordinates>
-    <panel_attributes>MQTT Driver
+    <panel_attributes>MQTT Application
 --
 void initalize()
 uint8_t set_status()
@@ -44,16 +43,16 @@ Publish signals to the MQTT Broker.</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>504</x>
-      <y>81</y>
+      <x>522</x>
+      <y>144</y>
       <w>279</w>
       <h>234</h>
     </coordinates>
-    <panel_attributes>NTP Driver
+    <panel_attributes>NTP Application
 --
 void initalize()
-uint8_t get_status()
 uint8_t set_status()
+uint8_t get_status()
 --
 Responsibilities
 Fetch date and time from NTP. </panel_attributes>
@@ -62,15 +61,14 @@ Fetch date and time from NTP. </panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>639</x>
-      <y>396</y>
+      <x>657</x>
+      <y>459</y>
       <w>279</w>
       <h>234</h>
     </coordinates>
     <panel_attributes>WiFi Driver
 --
 void initalize()
-uint8_t set_status()
 uint8_t get_status()
 uint8_t connect()
 --
@@ -81,8 +79,8 @@ Establish a connection to internet.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>630</x>
-      <y>306</y>
+      <x>648</x>
+      <y>369</y>
       <w>171</w>
       <h>108</h>
     </coordinates>
@@ -92,50 +90,75 @@ Establish a connection to internet.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>774</x>
-      <y>621</y>
-      <w>27</w>
-      <h>108</h>
-    </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
-    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>774</x>
-      <y>621</y>
-      <w>297</w>
+      <x>792</x>
+      <y>369</y>
+      <w>189</w>
       <h>81</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>310.0;10.0;310.0;70.0;10.0;70.0</additional_attributes>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;70.0;190.0;70.0;190.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>648</x>
-      <y>711</y>
-      <w>279</w>
-      <h>99</h>
+      <x>450</x>
+      <y>459</y>
+      <w>189</w>
+      <h>234</h>
     </coordinates>
-    <panel_attributes>ESP32
+    <panel_attributes>LED Driver
 --
 void initalize()
+uint8_t get_status()
 --
 Responsibilities
+Error indication for NTP and
+MQTT
 </panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>774</x>
-      <y>306</y>
-      <w>189</w>
-      <h>81</h>
+      <x>1026</x>
+      <y>369</y>
+      <w>63</w>
+      <h>72</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
-    <additional_attributes>10.0;70.0;190.0;70.0;190.0;10.0</additional_attributes>
+    <additional_attributes>10.0;60.0;50.0;60.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>738</x>
+      <y>369</y>
+      <w>315</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>330.0;100.0;330.0;60.0;10.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>603</x>
+      <y>369</y>
+      <w>324</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;50.0;340.0;50.0;340.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>369</y>
+      <w>90</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>80.0;100.0;80.0;50.0;10.0;50.0;10.0;10.0</additional_attributes>
   </element>
 </diagram>
