@@ -13,7 +13,15 @@ uint8_t wifi_driver_init(char *ssid, char *passwrd)
     return status;
 }
 
-void wifi_status_driver()
+uint8_t wifi_status()
 {
-    WiFi.status();
+    uint8_t status = OK;
+
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        status = ERROR;
+    }
+
+    return status;
 }
+

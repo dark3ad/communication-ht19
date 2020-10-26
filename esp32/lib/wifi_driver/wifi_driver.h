@@ -21,6 +21,6 @@ uint8_t wifi_driver_init(char *ssid, char *passwrd);
  * 
  */
 
-void wifi_status_driver(void);
+uint8_t wifi_status_driver(void);
 
 #endif // !WIFI_H
