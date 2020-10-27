@@ -15,6 +15,14 @@ void bsp_serial_begin(void);
 
 #else
 #include <stdio.h>
+
+#define LOW 0
+#define HIGH 1
+#define INPUT 0
+#define OUTPUT 1
+#define INPUT_PULLUP 2
+#define INPUT_PULLDOWN 3
+
 #ifdef DEVELOPMENT
 #define PRINTF(frmt, ...) printf(frmt, __VA_ARGS__)
 #else
