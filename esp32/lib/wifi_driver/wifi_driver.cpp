@@ -1,4 +1,4 @@
-#include <wifi_driver.h>
+#include "wifi_driver.h"
 
 uint8_t wifi_driver_init(char *ssid, char *passwrd)
 {
@@ -13,7 +13,7 @@ uint8_t wifi_driver_init(char *ssid, char *passwrd)
     return status;
 }
 
-uint8_t wifi_status()
+uint8_t wifi_status(void)
 {
     uint8_t status = OK;
 
@@ -24,4 +24,3 @@ uint8_t wifi_status()
 
     return status;
 }
-
