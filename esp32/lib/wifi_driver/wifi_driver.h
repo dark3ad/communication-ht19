@@ -1,8 +1,8 @@
 #ifndef WIFI_DRIVER_H
 #define WIFI_DRIVER_H
 
-#define ERROR (0U)
-#define OKEY (1U)
+#define DISCONNECTED (0U)
+#define CONNECTED (1U)
 
 /**
  * @brief driver to initialize the wifi connection on the esp32
