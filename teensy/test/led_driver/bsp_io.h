@@ -3,27 +3,13 @@
 
 #include <stdint.h>
 
-#ifndef LOW
+#ifndef TARGET
 #define LOW 0
-#endif
-
-#ifndef HIGH
 #define HIGH 1
-#endif
-
-#ifndef INPUT
 #define INPUT 0
-#endif
-
-#ifndef OUTPUT
 #define OUTPUT 1
-#endif
-
-#ifndef INPUT_PULLUP
 #define INPUT_PULLUP 2
-#endif
-
-#ifndef LED_BUILTIN
+#define INPUT_PULLDOWN 3
 #define LED_BUILTIN 13
 #endif
 
