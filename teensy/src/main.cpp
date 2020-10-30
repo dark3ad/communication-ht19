@@ -17,11 +17,12 @@ void setup()
     char *buffer;
 
     temp = sdcard_init();
-    //uint16_t free_space = sdcard_get_free_space();
     temp = sdcard_create_file("01");
     temp = sdcard_append_file("01", "APPENDTEST");
     temp = sdcard_create_file("02");
     filelist_t tmp = sdcard_get_files_list();
+
+    uint16_t free_space = sdcard_get_free_space();
 
     temp = sdcard_read_file("01", buffer, length);
     temp = sdcard_delete_file("01");
