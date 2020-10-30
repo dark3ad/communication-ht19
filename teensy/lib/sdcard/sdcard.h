@@ -26,13 +26,13 @@
 #define REMOVE_DIR_ERROR 10
 
 #define DAYS (31U)
-#define FILE_LENGTH (2U) // ex daynumber: 01
-#define ERROR_LOG "errors"
+#define FILE_LENGTH (3U) // ex daynumber: 01
+#define ERROR_LOG "ERRORS"
 
 typedef struct
 {
     uint8_t status;
-    char logs[DAYS];
+    char logs[DAYS][FILE_LENGTH];
     char errors[sizeof(ERROR_LOG)];
 } filelist_t;
 
@@ -91,9 +91,5 @@ uint8_t sdcard_append_file(const char *file_name, const char *text);
  * @return uint8_t 
  */
 uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length);
-
-void sort_strings(char str[DAYS][FILE_LENGTH], int len, int order_type);
-void print_2d_array(char str[DAYS][FILE_LENGTH], int len);
-void swap_str(char str1[], char str2[]);
 
 #endif /* SDCARD_H */
