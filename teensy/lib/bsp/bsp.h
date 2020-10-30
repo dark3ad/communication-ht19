@@ -1,7 +1,7 @@
 #ifndef BSP_H
 #define BSP_H
 
-#include <common.h>
+//#include <common.h>
 
 #ifdef TARGET
 #include <Arduino.h>
