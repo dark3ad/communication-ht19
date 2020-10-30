@@ -13,7 +13,7 @@ void setup()
 
     uint8_t temp;
 
-    uint16_t length;
+    uint16_t length = 0;
     char *buffer;
 
     temp = sdcard_init();
@@ -25,6 +25,8 @@ void setup()
     uint16_t free_space = sdcard_get_free_space();
 
     temp = sdcard_read_file("01", buffer, length);
+    Serial.println(buffer);
+
     temp = sdcard_delete_file("01");
 }
 

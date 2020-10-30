@@ -10,8 +10,15 @@
  */
 #include <SD.h>
 #include <bsp.h>
-#include <stdio.h>
 #include <sdcard.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_SIZE 1000
+#define EQUAL 0
+#define ASCENDING 0
+#define DESCENDING 1
 
 const int chipSelect = BUILTIN_SDCARD;
 File myFile;
@@ -148,17 +155,34 @@ filelist_t sdcard_get_files_list(void) ///////////////// HELP /////////////////
 {
     //REQ: It shall be possible to get the SORTED list of files on the SD card
 
-    //sortArray
-    //SPRINTF __format_arg
-    filelist_t tmp;
+    /**
+    File root = SD.open("/");
+    if (!root)
+        return OPEN_DIR_ERROR;
+    else
+    {
+        i = 0;
+        while (myFile = root.openNextFile())
+        {
+            if (strcmp(myFile.name(), ERROR_LOG))
+            {
+                strcpy(result[i], myFile.name());
+                i++;
+            }
+            //else {
+            //strcpy(result.errors, myFile.name());
+            //}
+            myFile.close();
+        }
+        root.close();
+        sortArray();
+    }
+*/
 
-    PRINTF("%s\n", "Listing files #1..."); // Solution #1
+    filelist_t result;
+    uint8_t i = 0;
 
-    root.openRoot(volume);
-    root.ls(LS_R | LS_DATE | LS_SIZE);
-    root.close();
-
-    PRINTF("%s\n", "Listing files #2..."); // Solution #2
+    PRINTF("%s\n", "Listing files ..."); // Solution #2
 
     myFile = SD.open("/");
 
@@ -172,13 +196,12 @@ filelist_t sdcard_get_files_list(void) ///////////////// HELP /////////////////
         }
 
         PRINTF("%s\n", entry.name());
-
         entry.close();
     }
 
     PRINTF("%s\n", "File listing... done.");
 
-    return tmp;
+    return result;
 }
 
 uint8_t sdcard_delete_file(const char *file_name)
@@ -269,30 +292,66 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length) /
 {
     //REQ: It shall be possible to read a file.
 
-    myFile = SD.open(file_name, FILE_READ);
+    uint16_t position = 0xFFFFFFFF;
 
-    if (myFile)
+    if (!SD.exists(file_name))
     {
-        PRINTF("%s\n", "Reading file %s...\n", file_name);
-
-        memset(buffer, 0, length);
-
-        if (myFile.available())
+        uint8_t i = strlen(file_name);
+        if ((i != 2) && (i != strlen(ERROR_LOG)))
         {
-            myFile.read(buffer, length);
+            position = 0xFFFFFFFF;
+            return FILE_NOT_EXIST;
         }
 
+        //char temp[i + 1] = {0};
+        //i = 0;
+        //strcpy(temp, file_name);
+        //while (file_name[i])
+        //{
+        //    file_name[i] = toupper(temp[i]);
+        //    i++;
+        //}
+    }
+
+    if (!SD.exists(file_name))
+    {
+        position = 0xFFFFFFFF;
+        return FILE_NOT_EXIST;
+    }
+
+    myFile = SD.open(file_name);
+    if (!myFile)
+    {
+        position = 0xFFFFFFFF;
+        return OPEN_FILE_ERROR;
+    }
+
+    position = (position == 0xFFFFFFFF) ? 0 : (position + length - 1);
+
+    if (position > myFile.size())
+    {
         myFile.close();
-
-        PRINTF("%s\n", "Reading done.\n", file_name);
-
-        return OKAY;
+        position = 0xFFFFFFFF;
     }
     else
     {
-        PRINTF("%s\n", "Reading file %s error.\n", file_name);
-        return READ_FILE_ERROR;
+
+        myFile.seek(position);
+        if (myFile.available())
+        {
+            if (myFile.read(buffer, length - 1) < 0)
+            {
+                myFile.close();
+                position = 0xFFFFFFFF;
+                return READ_FILE_ERROR;
+            }
+        }
+        else
+        {
+            position = 0xFFFFFFFF;
+        }
+        myFile.close();
     }
 
-    return READ_FILE_ERROR;
+    return OKAY;
 }
