@@ -22,11 +22,6 @@ SdFile root;
 
 uint8_t sdcard_init(void)
 {
-    //REQ: It shall be possible to initialize the SD card and delete all invalid files and folders
-
-    // CHECK 01-31 + ERROR (LOG)
-    // DELETE EVERYTHING ELSE.
-
     if (!SD.begin(chipSelect))
     {
         return SDCARD_BEGIN_ERROR;
@@ -46,33 +41,36 @@ uint8_t sdcard_init(void)
 
     while (my_file = root.openNextFile())
     {
-        Serial.println("TESTING INIT CLEAN");
+        _Bool check = false;
+        uint8_t temp = atoi(my_file.name());
+
+        for (uint8_t i = 1; i <= DAYS; i++)
+        {
+            if (i == temp && i != 0)
+            {
+                check = true;
+            }
+        }
+
+        uint8_t j = strlen(my_file.name());
+        if (j == strlen(ERROR_LOG))
+        {
+            check = true;
+        }
+
+        if (my_file.isDirectory())
+        {
+            SD.rmdir(my_file.name());
+        }
 
         if (!my_file.isDirectory())
         {
-            // få till char för att kolla.
-
-            // for (uint8_t i = 1; i <= DAYS; i++)
-            // {
-            //     char name;
-            //     name = (char)i + '0';
-
-            //     if (SD.exists((char)i))
-            //     {
-            //         Serial.printf("FOR LOOP CHAR: Str: %s - Dec: %d\n", i);
-            //     }
-            // }
-            // if (ERROR_LOG != my_file.name())
-            // {
-            //     SD.remove(my_file.name());
-            // }
+            if (!check)
+            {
+                SD.remove(my_file.name());
+            }
         }
-        if (my_file.isDirectory())
-        {
-            Serial.printf("REMOVING DIR %s\n", my_file.name());
 
-            SD.rmdir(my_file.name());
-        }
         my_file.close();
     }
     root.close();
@@ -121,7 +119,6 @@ filelist_t sdcard_get_files_list(void)
     }
     else
     {
-
         uint8_t j = 0;
         for (uint8_t i = 1; i <= DAYS; i++)
         {
@@ -216,7 +213,7 @@ uint8_t sdcard_append_file(const char *file_name, const char *text)
 uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
 {
 
-    ///////////////// BUG IN READING CONTENT FROM ERROR FILE/////////////////
+    ///////////////// BUG IN READING CONTENT FROM INSIDE ERROR FILE /////////////////
 
     static uint32_t position = 0xFFFFFFFFU;
 

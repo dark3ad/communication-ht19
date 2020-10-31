@@ -14,17 +14,18 @@ void setup()
     uint8_t temp;
 
     temp = sdcard_init();
-    temp = sdcard_create_file("1");
-    temp = sdcard_append_file("1", "APPENDTEST");
-    temp = sdcard_append_file("1", "ASDGSDGSDG");
-    temp = sdcard_create_file("3");
+    //temp = sdcard_append_file("1", "APPENDTEST");
+    //temp = sdcard_append_file("1", "ASDGSDGSDG");
 
-    temp = sdcard_create_file("33");
-    temp = sdcard_create_file("sdfgsdfh");
-    temp = sdcard_create_file("31");
+    // temp = sdcard_create_file("1");
+    // temp = sdcard_create_file("3");
+    // temp = sdcard_create_file("sdfgsdfh");
+    // temp = sdcard_create_file("33");
+    // temp = sdcard_create_file("31");
+    // temp = sdcard_create_file("32");
+    // temp = sdcard_create_file("ERRORS");
 
-    sdcard_create_file(ERROR_LOG);
-    sdcard_append_file(ERROR_LOG, "This is an error!\n");
+    // temp = sdcard_append_file("ERRORS", "This is an error!\n");
 
     filelist_t tmp = sdcard_get_files_list();
     if (tmp.status == OKAY)
@@ -43,11 +44,11 @@ void setup()
 
     uint16_t length = 10;
     char buffer[64] = {};
-    temp = sdcard_read_file("01", buffer, length);
+    temp = sdcard_read_file("1", buffer, length);
     Serial.println(buffer);
 
     memset(buffer, 0, sizeof(buffer));
-    temp = sdcard_read_file("01", buffer, length);
+    temp = sdcard_read_file("1", buffer, length);
     Serial.println(buffer);
 
     memset(buffer, 0, sizeof(buffer));
@@ -55,7 +56,7 @@ void setup()
     Serial.println(buffer);
     //temp = sdcard_delete_file("01");
 
-    sdcard_delete_file("01");
+    //sdcard_delete_file("1");
 
     tmp = sdcard_get_files_list();
     if (tmp.status == OKAY)
@@ -69,8 +70,8 @@ void setup()
         }
     }
 
-    sdcard_delete_file("02");
-    sdcard_delete_file(ERROR_LOG);
+    //sdcard_delete_file("2");
+    //sdcard_delete_file(ERROR_LOG);
 }
 
 void loop()
