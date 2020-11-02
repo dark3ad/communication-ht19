@@ -17,15 +17,15 @@ void setup()
     //temp = sdcard_append_file("1", "APPENDTEST");
     //temp = sdcard_append_file("1", "ASDGSDGSDG");
 
-    temp = sdcard_create_file("1");
-    temp = sdcard_create_file("3");
-    temp = sdcard_create_file("sdfgsdfh");
-    temp = sdcard_create_file("33");
-    temp = sdcard_create_file("31");
+    // temp = sdcard_create_file("1");
+    // temp = sdcard_create_file("3");
+    // temp = sdcard_create_file("sdfgsdfh");
+    // temp = sdcard_create_file("33");
+    // temp = sdcard_create_file("31");
     // temp = sdcard_create_file("32");
     // temp = sdcard_create_file("ERRORS");
 
-    temp = sdcard_append_file("ERRORS", "This is an error!\n");
+    // temp = sdcard_append_file("ERRORS", "This is an error!\n");
 
     filelist_t tmp = sdcard_get_files_list();
     if (tmp.status == OKAY)
@@ -42,7 +42,7 @@ void setup()
     uint16_t free_space = sdcard_get_free_space();
     Serial.printf("Free space (Mb) %d\n", free_space);
 
-    uint16_t length = 10;
+    uint16_t length = 15;
     char buffer[64] = {};
     temp = sdcard_read_file("1", buffer, length);
     Serial.println(buffer);

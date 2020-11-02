@@ -94,6 +94,6 @@ uint8_t sdcard_append_file(const char *file_name, const char *text);
  * @return uint8_t and statuscode according to 
  *         macro(5 = FILE_NOT_EXIST, 4 = OPEN_FILE_ERROR, 6 = READ_FILE_ERROR, 1 = OKAY)
  */
-uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length);
+uint8_t sdcard_read_file(char *file_name, char *buffer, uint16_t length);
 
 #endif /* SDCARD_H */

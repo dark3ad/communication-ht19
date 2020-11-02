@@ -210,10 +210,8 @@ uint8_t sdcard_append_file(const char *file_name, const char *text)
     return WRITE_FILE_ERROR;
 }
 
-uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
+uint8_t sdcard_read_file(char *file_name, char *buffer, uint16_t length)
 {
-
-    ///////////////// BUG IN READING CONTENT FROM INSIDE ERROR FILE /////////////////
 
     static uint32_t position = 0xFFFFFFFFU;
 
@@ -226,14 +224,14 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
             return FILE_NOT_EXIST;
         }
 
-        // char temp[i + 1] = {0};
-        // i = 0;
-        // strcpy(temp, file_name);
-        // while (file_name[i])
-        // {
-        //     file_name[i] = toupper(temp[i]);
-        //     i++;
-        // }
+        char temp[i + 1] = {0};
+        i = 0;
+        strcpy(temp, file_name);
+        while (file_name[i])
+        {
+            file_name[i] = toupper(temp[i]);
+            i++;
+        }
     }
 
     if (!SD.exists(file_name))
