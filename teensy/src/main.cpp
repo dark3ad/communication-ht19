@@ -1,5 +1,6 @@
 #include <bsp.h>
 #include <sdcard.h>
+// #include <SD.h>
 
 void setup()
 {
@@ -13,6 +14,10 @@ void setup()
 
     uint8_t temp;
 
+    // File root = SD.open("/");
+    // SD.mkdir("test");
+    // root.close();
+
     temp = sdcard_init();
     //temp = sdcard_append_file("1", "APPENDTEST");
     //temp = sdcard_append_file("1", "ASDGSDGSDG");
@@ -21,6 +26,7 @@ void setup()
     // temp = sdcard_create_file("3");
     // temp = sdcard_create_file("sdfgsdfh");
     // temp = sdcard_create_file("33");
+
     // temp = sdcard_create_file("31");
     // temp = sdcard_create_file("32");
     // temp = sdcard_create_file("ERRORS");

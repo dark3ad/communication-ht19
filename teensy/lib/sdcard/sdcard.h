@@ -40,7 +40,7 @@ typedef struct
  * @brief this function handles the initialisation of the buildin sdcard
  * 
  * @return uint8_t output of statuscode according to 
- *         macro(2 = SDCARD_BEGIN_ERROR, 1 = OKAY)
+ *         macro(2 = SDCARD_BEGIN_ERROR, 1 = OKAY, 8 = REMOVE_FILE_ERROR, 10 = REMOVE_DIR_ERROR)
  */
 uint8_t sdcard_init(void);
 
@@ -63,7 +63,7 @@ filelist_t sdcard_get_files_list(void);
  * @brief this function delete desired file on sdcard
  * 
  * @param file_name input for filename to delete
- * @return uint8_t and statuscode according to 
+ * @return uint8_t output statuscode according to 
  *         macro(5 = FILE_NOT_EXIST, 8 = REMOVE_FILE_ERROR, 1 = OKAY)
  */
 uint8_t sdcard_delete_file(const char *file_name);
@@ -72,7 +72,7 @@ uint8_t sdcard_delete_file(const char *file_name);
  * @brief this function create desired file on sdcard
  * 
  * @param file_name input for filename to create
- * @return uint8_t and statuscode according to macro(3 = CREATE_FILE_ERROR, 1 = OKAY)
+ * @return uint8_t output statuscode according to macro(3 = CREATE_FILE_ERROR, 1 = OKAY)
  */
 uint8_t sdcard_create_file(const char *file_name);
 
@@ -81,17 +81,17 @@ uint8_t sdcard_create_file(const char *file_name);
  * 
  * @param file_name input for filename to write to
  * @param text input for desired text to write to file
- * @return uint8_t and statuscode according to macro(7 = WRITE_FILE_ERROR, 1 = OKAY)
+ * @return uint8_t output statuscode according to macro(7 = WRITE_FILE_ERROR, 1 = OKAY)
  */
 uint8_t sdcard_append_file(const char *file_name, const char *text);
 
-/**
+/** 
  * @brief this function read content and length of desired file on sdcard
  * 
  * @param file_name input for desired file to read
  * @param buffer input for desired buffer to read to
  * @param length input for desired length of bytes to read
- * @return uint8_t and statuscode according to 
+ * @return uint8_t output statuscode according to 
  *         macro(5 = FILE_NOT_EXIST, 4 = OPEN_FILE_ERROR, 6 = READ_FILE_ERROR, 1 = OKAY)
  */
 uint8_t sdcard_read_file(char *file_name, char *buffer, uint16_t length);

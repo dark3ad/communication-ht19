@@ -15,7 +15,7 @@
 #include <stdbool.h>
 
 const int chipSelect = BUILTIN_SDCARD;
-File my_file;
+File my_file, rootpath;
 SdVolume volume;
 Sd2Card card;
 SdFile root;
@@ -37,9 +37,9 @@ uint8_t sdcard_init(void)
         return SDCARD_BEGIN_ERROR;
     }
 
-    File root = SD.open("/");
+    rootpath = SD.open("/");
 
-    while (my_file = root.openNextFile())
+    while (my_file = rootpath.openNextFile())
     {
         _Bool check = false;
         uint8_t temp = atoi(my_file.name());
@@ -61,6 +61,11 @@ uint8_t sdcard_init(void)
         if (my_file.isDirectory())
         {
             SD.rmdir(my_file.name());
+
+            if (SD.exists(my_file.name()))
+            {
+                return REMOVE_DIR_ERROR;
+            }
         }
 
         if (!my_file.isDirectory())
@@ -68,12 +73,17 @@ uint8_t sdcard_init(void)
             if (!check)
             {
                 SD.remove(my_file.name());
+
+                if (SD.exists(my_file.name()))
+                {
+                    return REMOVE_FILE_ERROR;
+                }
             }
         }
 
         my_file.close();
     }
-    root.close();
+    rootpath.close();
 
     return OKAY;
 }
@@ -81,12 +91,12 @@ uint8_t sdcard_init(void)
 uint16_t sdcard_get_free_space(void)
 {
     uint32_t size_used = 0;
-    File root = SD.open("/");
+    rootpath = SD.open("/");
 
-    if (!root)
+    if (!rootpath)
         return size_used;
 
-    while (my_file = root.openNextFile())
+    while (my_file = rootpath.openNextFile())
     {
         if (!my_file.isDirectory())
         {
@@ -94,7 +104,7 @@ uint16_t sdcard_get_free_space(void)
         }
         my_file.close();
     }
-    root.close();
+    rootpath.close();
 
     uint32_t volumesize;
     volumesize = volume.blocksPerCluster(); // clusters are collections of blocks
@@ -109,11 +119,10 @@ uint16_t sdcard_get_free_space(void)
 
 filelist_t sdcard_get_files_list(void)
 {
-
     filelist_t result = {};
 
-    File root = SD.open("/");
-    if (!root)
+    rootpath = SD.open("/");
+    if (!rootpath)
     {
         result.status = OPEN_DIR_ERROR;
     }
@@ -138,7 +147,7 @@ filelist_t sdcard_get_files_list(void)
 
         result.status = OKAY;
 
-        root.close();
+        rootpath.close();
     }
 
     return result;
