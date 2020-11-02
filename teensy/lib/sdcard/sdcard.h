@@ -26,7 +26,7 @@
 #define REMOVE_DIR_ERROR 10
 
 #define DAYS (31U)
-#define FILE_LENGTH (3U) // ex daynumber: 01
+#define FILE_LENGTH (3U)
 #define ERROR_LOG "ERRORS"
 
 typedef struct
@@ -37,58 +37,62 @@ typedef struct
 } filelist_t;
 
 /**
- * @brief 
+ * @brief this function handles the initialisation of the buildin sdcard
  * 
- * @return uint8_t 
+ * @return uint8_t output of statuscode according to 
+ *         macro(2 = SDCARD_BEGIN_ERROR, 1 = OKAY)
  */
 uint8_t sdcard_init(void);
 
 /**
- * @brief 
+ * @brief this function check the amount of (Mb) free space of the sdcard
  * 
- * @return uint16_t 
+ * @return uint16_t output integer of megabytes free space
  */
 uint16_t sdcard_get_free_space(void);
 
 /**
- * @brief 
+ * @brief this function check what files are available on the sdcard and groups them in status, logs and errors
  * 
- * @return filelist_t 
+ * @return filelist_t output struct as uint8_t status, char logs 2D-array and char errors 1D-array and 
+ *         statuscode according to macro(9 = OPEN_DIR_ERROR, 1 = OKAY)
  */
 filelist_t sdcard_get_files_list(void);
 
 /**
- * @brief 
+ * @brief this function delete desired file on sdcard
  * 
- * @param file_name 
- * @return uint8_t 
+ * @param file_name input for filename to delete
+ * @return uint8_t and statuscode according to 
+ *         macro(5 = FILE_NOT_EXIST, 8 = REMOVE_FILE_ERROR, 1 = OKAY)
  */
 uint8_t sdcard_delete_file(const char *file_name);
 
 /**
- * @brief 
+ * @brief this function create desired file on sdcard
  * 
- * @param file_name 
- * @return uint8_t 
+ * @param file_name input for filename to create
+ * @return uint8_t and statuscode according to macro(3 = CREATE_FILE_ERROR, 1 = OKAY)
  */
 uint8_t sdcard_create_file(const char *file_name);
 
 /**
- * @brief 
+ * @brief this function write content to desired file on sdcard
  * 
- * @param file_name 
- * @param text 
- * @return uint8_t 
+ * @param file_name input for filename to write to
+ * @param text input for desired text to write to file
+ * @return uint8_t and statuscode according to macro(7 = WRITE_FILE_ERROR, 1 = OKAY)
  */
 uint8_t sdcard_append_file(const char *file_name, const char *text);
 
 /**
- * @brief 
+ * @brief this function read content and length of desired file on sdcard
  * 
- * @param file_name 
- * @param buffer 
- * @param length 
- * @return uint8_t 
+ * @param file_name input for desired file to read
+ * @param buffer input for desired buffer to read to
+ * @param length input for desired length of bytes to read
+ * @return uint8_t and statuscode according to 
+ *         macro(5 = FILE_NOT_EXIST, 4 = OPEN_FILE_ERROR, 6 = READ_FILE_ERROR, 1 = OKAY)
  */
 uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length);
 

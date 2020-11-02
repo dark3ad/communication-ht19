@@ -17,15 +17,15 @@ void setup()
     //temp = sdcard_append_file("1", "APPENDTEST");
     //temp = sdcard_append_file("1", "ASDGSDGSDG");
 
-    // temp = sdcard_create_file("1");
-    // temp = sdcard_create_file("3");
-    // temp = sdcard_create_file("sdfgsdfh");
-    // temp = sdcard_create_file("33");
-    // temp = sdcard_create_file("31");
+    temp = sdcard_create_file("1");
+    temp = sdcard_create_file("3");
+    temp = sdcard_create_file("sdfgsdfh");
+    temp = sdcard_create_file("33");
+    temp = sdcard_create_file("31");
     // temp = sdcard_create_file("32");
     // temp = sdcard_create_file("ERRORS");
 
-    // temp = sdcard_append_file("ERRORS", "This is an error!\n");
+    temp = sdcard_append_file("ERRORS", "This is an error!\n");
 
     filelist_t tmp = sdcard_get_files_list();
     if (tmp.status == OKAY)
