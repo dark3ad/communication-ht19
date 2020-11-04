@@ -1,3 +1,14 @@
+/**
+ * @file wifi_driver.h
+ * @author your name (you@domain.com)
+ * @brief Wifi driver intended for ESP32 in GreenHouse project
+ * @version 0.1
+ * @date 2020-11-04
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
+
 #ifndef WIFI_DRIVER_H
 #define WIFI_DRIVER_H
 
