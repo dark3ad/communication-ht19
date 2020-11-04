@@ -14,20 +14,19 @@
 #include <string.h>
 #include <stdbool.h>
 
-const int chipSelect = BUILTIN_SDCARD;
-File my_file, rootpath;
+static uint32_t volumesize;
 SdVolume volume;
 Sd2Card card;
 SdFile root;
 
 uint8_t sdcard_init(void)
 {
-    if (!SD.begin(chipSelect))
+    if (!SD.begin(BUILTIN_SDCARD))
     {
         return SDCARD_BEGIN_ERROR;
     }
 
-    if (!card.init(SPI_HALF_SPEED, chipSelect))
+    if (!card.init(SPI_HALF_SPEED, BUILTIN_SDCARD))
     {
         return SDCARD_BEGIN_ERROR;
     }
@@ -37,9 +36,15 @@ uint8_t sdcard_init(void)
         return SDCARD_BEGIN_ERROR;
     }
 
-    rootpath = SD.open("/");
+    volumesize = volume.blocksPerCluster(); // clusters are collections of blocks
+    volumesize *= volume.clusterCount();    // we'll have a lot of clusters
+    volumesize /= 2;                        // SD card blocks are always 512 bytes (2 blocks are 1KB)
+    volumesize /= 1024;
 
-    while (my_file = rootpath.openNextFile())
+    File root = SD.open("/");
+    File my_file;
+
+    while (my_file = root.openNextFile())
     {
         _Bool check = false;
         uint8_t temp = atoi(my_file.name());
@@ -83,7 +88,7 @@ uint8_t sdcard_init(void)
 
         my_file.close();
     }
-    rootpath.close();
+    root.close();
 
     return OKAY;
 }
@@ -91,12 +96,15 @@ uint8_t sdcard_init(void)
 uint16_t sdcard_get_free_space(void)
 {
     uint32_t size_used = 0;
-    rootpath = SD.open("/");
+    File root = SD.open("/");
+    File my_file;
 
-    if (!rootpath)
+    if (!root)
+    {
         return size_used;
+    }
 
-    while (my_file = rootpath.openNextFile())
+    while (my_file = root.openNextFile())
     {
         if (!my_file.isDirectory())
         {
@@ -104,15 +112,9 @@ uint16_t sdcard_get_free_space(void)
         }
         my_file.close();
     }
-    rootpath.close();
+    root.close();
 
-    uint32_t volumesize;
-    volumesize = volume.blocksPerCluster(); // clusters are collections of blocks
-    volumesize *= volume.clusterCount();    // we'll have a lot of clusters
-    volumesize /= 2;                        // SD card blocks are always 512 bytes (2 blocks are 1KB)
-    volumesize /= 1024;
-
-    size_used *= 0.000001; // Bytes to MB Conversion
+    size_used /= (1024 * 1024);
 
     return (uint16_t)(volumesize - size_used);
 }
@@ -120,9 +122,9 @@ uint16_t sdcard_get_free_space(void)
 filelist_t sdcard_get_files_list(void)
 {
     filelist_t result = {};
+    File root = SD.open("/");
 
-    rootpath = SD.open("/");
-    if (!rootpath)
+    if (!root)
     {
         result.status = OPEN_DIR_ERROR;
     }
@@ -147,7 +149,7 @@ filelist_t sdcard_get_files_list(void)
 
         result.status = OKAY;
 
-        rootpath.close();
+        root.close();
     }
 
     return result;
@@ -182,8 +184,7 @@ uint8_t sdcard_create_file(const char *file_name)
 
     if (!SD.exists(file_name))
     {
-        my_file = SD.open(file_name, FILE_WRITE);
-
+        File my_file = SD.open(file_name, FILE_WRITE);
         my_file.close();
 
         if (SD.exists(file_name))
@@ -205,7 +206,7 @@ uint8_t sdcard_create_file(const char *file_name)
 
 uint8_t sdcard_append_file(const char *file_name, const char *text)
 {
-    my_file = SD.open(file_name, FILE_WRITE);
+    File my_file = SD.open(file_name, FILE_WRITE);
 
     if (my_file)
     {
@@ -262,7 +263,7 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
         return FILE_NOT_EXIST;
     }
 
-    my_file = SD.open(temp);
+    File my_file = SD.open(temp);
     if (!my_file)
     {
         position = 0xFFFFFFFFU;
