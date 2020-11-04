@@ -13,7 +13,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-static uint8_t removeDirectory(char *name);
+static uint8_t remove_directory(char *name);
 static uint8_t erase_memory(void);
 
 static uint32_t volumesize;
@@ -39,7 +39,6 @@ uint8_t sdcard_init(void)
     {
         return SDCARD_BEGIN_ERROR;
     }
-
     volumesize = volume.blocksPerCluster(); // clusters are collections of blocks
     volumesize *= volume.clusterCount();    // we'll have a lot of clusters
     volumesize /= 2;                        // SD card blocks are always 512 bytes (2 blocks are 1KB)
@@ -169,6 +168,7 @@ uint8_t sdcard_append_file(const char *file_name, const char *text)
     {
         my_file.print(text);
         my_file.close();
+
         return OKAY;
     }
     else
@@ -270,7 +270,7 @@ static uint8_t erase_memory(void)
     {
         if (entry.isDirectory())
         {
-            status = removeDirectory(entry.name());
+            status = remove_directory(entry.name());
         }
         if (!entry.isDirectory())
         {
@@ -302,15 +302,18 @@ static uint8_t erase_memory(void)
             }
         }
         entry.close();
+
         if (status != OKAY)
+        {
             break;
+        }
     }
     root.close();
 
     return status;
 }
 
-static uint8_t removeDirectory(char *name)
+static uint8_t remove_directory(char *name)
 {
     if (!SD.rmdir(name))
     {
@@ -326,7 +329,7 @@ static uint8_t removeDirectory(char *name)
             sprintf(entryName, "%s/%s", name, entry.name());
             if (entry.isDirectory())
             {
-                removeDirectory(entryName);
+                remove_directory(entryName);
             }
             else
             {
