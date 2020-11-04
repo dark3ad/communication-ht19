@@ -173,6 +173,8 @@ uint8_t sdcard_delete_file(const char *file_name)
     {
         return OKAY;
     }
+
+    return REMOVE_FILE_ERROR;
 }
 
 uint8_t sdcard_create_file(const char *file_name)
