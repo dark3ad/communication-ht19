@@ -11,6 +11,8 @@
 
 #include <Arduino.h>
 #include <wifi_driver.h>
+#include <i2c_driver.h>
+#include <led_driver.h>
 #include "time.h"
 
 #define SSID "MOVISTAR_11E9"
