@@ -302,8 +302,8 @@ static uint8_t erase_memory(void)
             }
         }
         entry.close();
-        // if (status != OKAY)
-        //     break;
+        if (status != OKAY)
+            break;
     }
     root.close();
 
