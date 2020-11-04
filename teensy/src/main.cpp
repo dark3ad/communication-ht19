@@ -32,6 +32,8 @@ void setup()
     // temp = sdcard_create_file("ERRORS");
 
     // temp = sdcard_append_file("ERRORS", "This is an error!\n");
+    uint16_t free_space = sdcard_get_free_space();
+    Serial.printf("Free space (Mb) %d\n", free_space);
 
     filelist_t tmp = sdcard_get_files_list();
     if (tmp.status == OKAY)
@@ -45,8 +47,6 @@ void setup()
         }
     }
 
-    uint16_t free_space = sdcard_get_free_space();
-    Serial.printf("Free space (Mb) %d\n", free_space);
 
     uint16_t length = 15;
     char buffer[64] = {};

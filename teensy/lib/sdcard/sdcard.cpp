@@ -9,18 +9,22 @@
  * 
  */
 #include <SD.h>
-#include <bsp.h>
 #include <sdcard.h>
 #include <string.h>
 #include <stdbool.h>
 
+static uint8_t removeDirectory(char *name);
+static uint8_t erase_memory(void);
+
 static uint32_t volumesize;
-SdVolume volume;
-Sd2Card card;
-SdFile root;
+static SdVolume volume;
+static Sd2Card card;
+static SdFile root;
 
 uint8_t sdcard_init(void)
 {
+    uint8_t status = OKAY;
+
     if (!SD.begin(BUILTIN_SDCARD))
     {
         return SDCARD_BEGIN_ERROR;
@@ -41,56 +45,9 @@ uint8_t sdcard_init(void)
     volumesize /= 2;                        // SD card blocks are always 512 bytes (2 blocks are 1KB)
     volumesize /= 1024;
 
-    File root = SD.open("/");
-    File my_file;
+    status = erase_memory();
 
-    while (my_file = root.openNextFile())
-    {
-        _Bool check = false;
-        uint8_t temp = atoi(my_file.name());
-
-        for (uint8_t i = 1; i <= DAYS; i++)
-        {
-            if (i == temp && i != 0)
-            {
-                check = true;
-            }
-        }
-
-        uint8_t j = strlen(my_file.name());
-        if (j == strlen(ERROR_LOG))
-        {
-            check = true;
-        }
-
-        if (my_file.isDirectory())
-        {
-            SD.rmdir(my_file.name());
-
-            if (SD.exists(my_file.name()))
-            {
-                return REMOVE_DIR_ERROR;
-            }
-        }
-
-        if (!my_file.isDirectory())
-        {
-            if (!check)
-            {
-                SD.remove(my_file.name());
-
-                if (SD.exists(my_file.name()))
-                {
-                    return REMOVE_FILE_ERROR;
-                }
-            }
-        }
-
-        my_file.close();
-    }
-    root.close();
-
-    return OKAY;
+    return status;
 }
 
 uint16_t sdcard_get_free_space(void)
@@ -296,5 +253,93 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
         my_file.close();
     }
 
+    return OKAY;
+}
+
+static uint8_t erase_memory(void)
+{
+    File entry;
+    uint8_t status = OKAY;
+    File root = SD.open("/");
+
+    if (!root)
+    {
+        return OPEN_DIR_ERROR;
+    }
+    while (entry = root.openNextFile())
+    {
+        if (entry.isDirectory())
+        {
+            status = removeDirectory(entry.name());
+        }
+        if (!entry.isDirectory())
+        {
+            _Bool check = false;
+            uint8_t temp = atoi(entry.name());
+
+            for (uint8_t i = 1; i <= DAYS; i++)
+            {
+                if (i == temp && i != 0)
+                {
+                    check = true;
+                }
+            }
+
+            uint8_t j = strlen(entry.name());
+            if (j == strlen(ERROR_LOG))
+            {
+                check = true;
+            }
+            if (!check)
+            {
+
+                status = SD.remove(entry.name()) ? OKAY : REMOVE_FILE_ERROR;
+
+                if (SD.exists(entry.name()))
+                {
+                    return REMOVE_FILE_ERROR;
+                }
+            }
+        }
+        entry.close();
+        // if (status != OKAY)
+        //     break;
+    }
+    root.close();
+
+    return status;
+}
+
+static uint8_t removeDirectory(char *name)
+{
+    if (!SD.rmdir(name))
+    {
+        File entry;
+        File root = SD.open(name);
+        if (!root)
+        {
+            return OPEN_DIR_ERROR;
+        }
+        while (entry = root.openNextFile())
+        {
+            char entryName[32];
+            sprintf(entryName, "%s/%s", name, entry.name());
+            if (entry.isDirectory())
+            {
+                removeDirectory(entryName);
+            }
+            else
+            {
+                SD.remove(entryName);
+            }
+            entry.close();
+        }
+        root.close();
+
+        if (!SD.rmdir(name))
+        {
+            return REMOVE_DIR_ERROR;
+        }
+    }
     return OKAY;
 }
