@@ -13,17 +13,19 @@
 #include <string.h>
 #include <stdbool.h>
 
-static uint8_t remove_directory(char *name);
+static uint8_t remove_directory(File dir, String temp_path);
 static uint8_t erase_memory(void);
 
+static String rootpath = "/";
 static uint32_t volumesize;
-static SdVolume volume;
-static Sd2Card card;
-static SdFile root;
+
+SdVolume volume;
+Sd2Card card;
+SdFile root;
 
 uint8_t sdcard_init(void)
 {
-    uint8_t status = OKAY;
+    uint8_t status = SDCARD_BEGIN_ERROR;
 
     if (!SD.begin(BUILTIN_SDCARD))
     {
@@ -39,9 +41,10 @@ uint8_t sdcard_init(void)
     {
         return SDCARD_BEGIN_ERROR;
     }
-    volumesize = volume.blocksPerCluster(); // clusters are collections of blocks
-    volumesize *= volume.clusterCount();    // we'll have a lot of clusters
-    volumesize /= 2;                        // SD card blocks are always 512 bytes (2 blocks are 1KB)
+
+    volumesize = volume.blocksPerCluster();
+    volumesize *= volume.clusterCount();
+    volumesize /= 2;
     volumesize /= 1024;
 
     status = erase_memory();
@@ -53,20 +56,20 @@ uint16_t sdcard_get_free_space(void)
 {
     uint32_t size_used = 0;
     File root = SD.open("/");
-    File my_file;
+    File entry;
 
     if (!root)
     {
         return size_used;
     }
 
-    while (my_file = root.openNextFile())
+    while (entry = root.openNextFile())
     {
-        if (!my_file.isDirectory())
+        if (!entry.isDirectory())
         {
-            size_used += my_file.size();
+            size_used += entry.size();
         }
-        my_file.close();
+        entry.close();
     }
     root.close();
 
@@ -104,9 +107,8 @@ filelist_t sdcard_get_files_list(void)
         }
 
         result.status = OKAY;
-
-        root.close();
     }
+    root.close();
 
     return result;
 }
@@ -140,11 +142,12 @@ uint8_t sdcard_create_file(const char *file_name)
 
     if (!SD.exists(file_name))
     {
-        File my_file = SD.open(file_name, FILE_WRITE);
-        my_file.close();
+        File entry = SD.open(file_name, FILE_WRITE);
+        entry.close();
 
         if (SD.exists(file_name))
         {
+
             return OKAY;
         }
         else
@@ -162,12 +165,12 @@ uint8_t sdcard_create_file(const char *file_name)
 
 uint8_t sdcard_append_file(const char *file_name, const char *text)
 {
-    File my_file = SD.open(file_name, FILE_WRITE);
+    File entry = SD.open(file_name, FILE_WRITE);
 
-    if (my_file)
+    if (entry)
     {
-        my_file.print(text);
-        my_file.close();
+        entry.print(text);
+        entry.close();
 
         return OKAY;
     }
@@ -220,8 +223,8 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
         return FILE_NOT_EXIST;
     }
 
-    File my_file = SD.open(temp);
-    if (!my_file)
+    File entry = SD.open(temp);
+    if (!entry)
     {
         position = 0xFFFFFFFFU;
         return OPEN_FILE_ERROR;
@@ -229,19 +232,19 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
 
     position = (position == 0xFFFFFFFFU) ? 0 : (position + length - 1);
 
-    if (position > my_file.size())
+    if (position > entry.size())
     {
-        my_file.close();
+        entry.close();
         position = 0xFFFFFFFFU;
     }
     else
     {
-        my_file.seek(position);
-        if (my_file.available())
+        entry.seek(position);
+        if (entry.available())
         {
-            if (my_file.read(buffer, length - 1) < 0)
+            if (entry.read(buffer, length - 1) < 0)
             {
-                my_file.close();
+                entry.close();
                 position = 0xFFFFFFFFU;
                 return READ_FILE_ERROR;
             }
@@ -250,7 +253,7 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
         {
             position = 0xFFFFFFFFU;
         }
-        my_file.close();
+        entry.close();
     }
 
     return OKAY;
@@ -258,91 +261,115 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
 
 static uint8_t erase_memory(void)
 {
-    File entry;
-    uint8_t status = OKAY;
+    uint8_t status = REMOVE_FILE_ERROR;
     File root = SD.open("/");
+    File entry;
 
-    if (!root)
-    {
-        return OPEN_DIR_ERROR;
-    }
     while (entry = root.openNextFile())
     {
-        if (entry.isDirectory())
-        {
-            status = remove_directory(entry.name());
-        }
-        if (!entry.isDirectory())
-        {
-            _Bool check = false;
-            uint8_t temp = atoi(entry.name());
+        _Bool check = false;
+        uint8_t temp = atoi(entry.name());
 
-            for (uint8_t i = 1; i <= DAYS; i++)
-            {
-                if (i == temp && i != 0)
-                {
-                    check = true;
-                }
-            }
-
-            uint8_t j = strlen(entry.name());
-            if (j == strlen(ERROR_LOG))
+        for (uint8_t i = 1; i <= DAYS; i++)
+        {
+            if (i == temp && i != 0)
             {
                 check = true;
             }
+        }
+
+        uint8_t j = strlen(entry.name());
+        if (j == strlen(ERROR_LOG))
+        {
+            check = true;
+        }
+
+        if (entry.isDirectory())
+        {
+            SD.rmdir(entry.name());
+
+            if (SD.exists(entry.name()))
+            {
+                String temp_path = rootpath + entry.name() + rootpath;
+                status = remove_directory(entry, temp_path);
+            }
+
+            SD.rmdir(entry.name());
+        }
+
+        if (!entry.isDirectory())
+        {
             if (!check)
             {
-
-                status = SD.remove(entry.name()) ? OKAY : REMOVE_FILE_ERROR;
+                SD.remove(entry.name());
 
                 if (SD.exists(entry.name()))
                 {
-                    return REMOVE_FILE_ERROR;
+                    status = REMOVE_FILE_ERROR;
+                }
+                else
+                {
+                    status = OKAY;
                 }
             }
         }
-        entry.close();
 
-        if (status != OKAY)
-        {
-            break;
-        }
+        entry.close();
     }
     root.close();
 
     return status;
 }
 
-static uint8_t remove_directory(char *name)
+static uint8_t remove_directory(File dir, String temp_path)
 {
-    if (!SD.rmdir(name))
+    uint8_t status = REMOVE_DIR_ERROR;
+
+    while (true)
     {
-        File entry;
-        File root = SD.open(name);
-        if (!root)
+        File entry = dir.openNextFile();
+        String localpath;
+
+        if (entry)
         {
-            return OPEN_DIR_ERROR;
-        }
-        while (entry = root.openNextFile())
-        {
-            char entryName[32];
-            sprintf(entryName, "%s/%s", name, entry.name());
             if (entry.isDirectory())
             {
-                remove_directory(entryName);
+                localpath = temp_path + entry.name() + rootpath + '\0';
+                char folder_buf[localpath.length()];
+                localpath.toCharArray(folder_buf, localpath.length());
+                status = remove_directory(entry, folder_buf);
+
+                if (SD.rmdir(folder_buf))
+                {
+                    status = OKAY;
+                }
+                else
+                {
+                    status = REMOVE_DIR_ERROR;
+                }
             }
             else
             {
-                SD.remove(entryName);
-            }
-            entry.close();
-        }
-        root.close();
+                Serial.println(localpath);
+                localpath = temp_path + entry.name() + '\0';
+                char char_buf[localpath.length()];
+                localpath.toCharArray(char_buf, localpath.length());
 
-        if (!SD.rmdir(name))
+                if (SD.remove(char_buf))
+                {
+                    status = OKAY;
+                }
+                else
+                {
+                    status = REMOVE_FILE_ERROR;
+                }
+            }
+        }
+        else
         {
-            return REMOVE_DIR_ERROR;
+            entry.close();
+            break;
         }
     }
-    return OKAY;
+    return status;
 }

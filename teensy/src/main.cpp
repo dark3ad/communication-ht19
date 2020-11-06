@@ -1,6 +1,5 @@
 #include <bsp.h>
 #include <sdcard.h>
-// #include <SD.h>
 
 void setup()
 {
@@ -14,24 +13,19 @@ void setup()
 
     uint8_t temp;
 
-    // File root = SD.open("/");
-    // SD.mkdir("test");
-    // root.close();
-
     temp = sdcard_init();
-    //temp = sdcard_append_file("1", "APPENDTEST");
-    //temp = sdcard_append_file("1", "ASDGSDGSDG");
 
     // temp = sdcard_create_file("1");
+    // temp = sdcard_append_file("1", "APPENDTEST");
+    // temp = sdcard_append_file("1", "ASDGSDGSDG");
     // temp = sdcard_create_file("3");
     // temp = sdcard_create_file("sdfgsdfh");
     // temp = sdcard_create_file("33");
-
     // temp = sdcard_create_file("31");
     // temp = sdcard_create_file("32");
     // temp = sdcard_create_file("ERRORS");
-
     // temp = sdcard_append_file("ERRORS", "This is an error!\n");
+
     uint16_t free_space = sdcard_get_free_space();
     Serial.printf("Free space (Mb) %d\n", free_space);
 
@@ -47,8 +41,7 @@ void setup()
         }
     }
 
-
-    uint16_t length = 15;
+    uint16_t length = 10;
     char buffer[64] = {};
     temp = sdcard_read_file("1", buffer, length);
     Serial.println(buffer);
@@ -62,7 +55,7 @@ void setup()
     Serial.println(buffer);
     //temp = sdcard_delete_file("01");
 
-    //sdcard_delete_file("1");
+    temp = sdcard_delete_file("3");
 
     tmp = sdcard_get_files_list();
     if (tmp.status == OKAY)
