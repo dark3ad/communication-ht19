@@ -30,7 +30,7 @@ void loop()
     if (get_ntp_datetime(date_time))
     {
         Serial.println((char *)date_time);
-        send_get_ntp_datetime(date_time);
+        send_ntp_datetime(date_time);
     }
 
     /*if (i2c_driver_read(rx_buffer, sizeof(rx_buffer))) // doubt

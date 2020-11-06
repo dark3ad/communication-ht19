@@ -41,7 +41,7 @@ uint8_t get_ntp_datetime(uint8_t *ntp)
     return OKAY;
 }
 
-uint8_t send_get_ntp_datetime(uint8_t *datetime)
+uint8_t send_ntp_datetime(uint8_t *datetime)
 {
 
     if (!i2c_driver_write(datetime))
