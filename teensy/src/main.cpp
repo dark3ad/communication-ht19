@@ -55,7 +55,7 @@ void setup()
     Serial.println(buffer);
     //temp = sdcard_delete_file("01");
 
-    temp = sdcard_delete_file("3");
+    // temp = sdcard_delete_file("3");
 
     tmp = sdcard_get_files_list();
     if (tmp.status == OKAY)

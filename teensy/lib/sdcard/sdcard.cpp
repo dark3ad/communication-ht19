@@ -13,19 +13,17 @@
 #include <string.h>
 #include <stdbool.h>
 
-static uint8_t remove_directory(File dir, String temp_path);
+static uint8_t remove_directory(File entry, String init_path);
 static uint8_t erase_memory(void);
 
-static String rootpath = "/";
 static uint32_t volumesize;
 
-SdVolume volume;
-Sd2Card card;
-SdFile root;
+SdVolume volume; // FLYTTA TILL INIT-FUNKTIONEN & DEBUGGA, NÄR ALLT ANNAT ÄR ÅTGÄRDAT
+Sd2Card card;    // FLYTTA TILL INIT-FUNKTIONEN & DEBUGGA, NÄR ALLT ANNAT ÄR ÅTGÄRDAT
+SdFile root;     // FLYTTA TILL INIT-FUNKTIONEN & DEBUGGA, NÄR ALLT ANNAT ÄR ÅTGÄRDAT
 
 uint8_t sdcard_init(void)
 {
-    uint8_t status = SDCARD_BEGIN_ERROR;
 
     if (!SD.begin(BUILTIN_SDCARD))
     {
@@ -47,9 +45,7 @@ uint8_t sdcard_init(void)
     volumesize /= 2;
     volumesize /= 1024;
 
-    status = erase_memory();
-
-    return status;
+    return erase_memory();
 }
 
 uint16_t sdcard_get_free_space(void)
@@ -115,71 +111,59 @@ filelist_t sdcard_get_files_list(void)
 
 uint8_t sdcard_delete_file(const char *file_name)
 {
-
-    if (SD.exists(file_name))
-    {
-        SD.remove(file_name);
-    }
-    else
+    if (!SD.exists(file_name))
     {
         return FILE_NOT_EXIST;
     }
-
-    if (SD.exists(file_name))
-    {
-        return REMOVE_FILE_ERROR;
-    }
     else
     {
-        return OKAY;
+        SD.remove(file_name);
+        if (SD.exists(file_name))
+        {
+            return REMOVE_FILE_ERROR;
+        }
     }
 
-    return REMOVE_FILE_ERROR;
+    return OKAY;
 }
 
 uint8_t sdcard_create_file(const char *file_name)
 {
-
-    if (!SD.exists(file_name))
+    if (SD.exists(file_name))
+    {
+        return CREATE_FILE_ERROR;
+    }
+    else
     {
         File entry = SD.open(file_name, FILE_WRITE);
         entry.close();
 
-        if (SD.exists(file_name))
-        {
-
-            return OKAY;
-        }
-        else
+        if (!SD.exists(file_name))
         {
             return CREATE_FILE_ERROR;
         }
     }
-    else
-    {
-        return CREATE_FILE_ERROR;
-    }
 
-    return CREATE_FILE_ERROR;
+    return OKAY;
 }
 
 uint8_t sdcard_append_file(const char *file_name, const char *text)
 {
     File entry = SD.open(file_name, FILE_WRITE);
 
-    if (entry)
+    if (!entry)
     {
-        entry.print(text);
         entry.close();
 
-        return OKAY;
+        return WRITE_FILE_ERROR;
     }
     else
     {
-        return WRITE_FILE_ERROR;
+        entry.print(text);
+        entry.close();
     }
 
-    return WRITE_FILE_ERROR;
+    return OKAY;
 }
 
 uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
@@ -261,69 +245,76 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
 
 static uint8_t erase_memory(void)
 {
-    uint8_t status = REMOVE_FILE_ERROR;
-    File root = SD.open("/");
+
+    // Open the entry
+    // If it is a file => check if not valid => remove it
+    // else if it is a folder and it is empty => remove it otherwise go to the first step
+
     File entry;
+    File root = SD.open("/");
+    String root_path = "/";
 
     while (entry = root.openNextFile())
     {
-        _Bool check = false;
-        uint8_t temp = atoi(entry.name());
-
-        for (uint8_t i = 1; i <= DAYS; i++)
-        {
-            if (i == temp && i != 0)
-            {
-                check = true;
-            }
-        }
-
-        uint8_t j = strlen(entry.name());
-        if (j == strlen(ERROR_LOG))
-        {
-            check = true;
-        }
+        char *entry_name = entry.name();
 
         if (entry.isDirectory())
         {
-            SD.rmdir(entry.name());
+            String init_path = root_path + entry.name() + root_path;
+            remove_directory(entry, init_path);
 
-            if (SD.exists(entry.name()))
+            if (!SD.rmdir(entry_name))
             {
-                String temp_path = rootpath + entry.name() + rootpath;
-                status = remove_directory(entry, temp_path);
+                entry.close();
+                return REMOVE_DIR_ERROR;
             }
-
-            SD.rmdir(entry.name());
         }
-
-        if (!entry.isDirectory())
+        else
         {
-            if (!check)
+            bool is_valid = false;
+            if (!strcmp(ERROR_LOG, entry_name))
             {
-                SD.remove(entry.name());
+                is_valid = true;
+            }
+            else
+            {
 
-                if (SD.exists(entry.name()))
+                for (uint8_t i = 1; i <= DAYS; i++)
                 {
-                    status = REMOVE_FILE_ERROR;
+                    char name[FILE_LENGTH] = {};
+                    sprintf(name, "%d", i); // sprintf(name, "%02d", i); <-- DELETES everything under 10 due to %02d, correction to %d
+                    if (!strcmp(name, entry_name))
+                    {
+                        is_valid = true;
+                        break;
+                    }
                 }
-                else
+            }
+            if (!is_valid)
+            {
+                if (!SD.remove(entry_name))
                 {
-                    status = OKAY;
+                    entry.close();
+                    return REMOVE_FILE_ERROR;
                 }
             }
         }
-
         entry.close();
     }
     root.close();
-
-    return status;
+    return OKAY;
 }
 
-static uint8_t remove_directory(File dir, String temp_path)
+static uint8_t remove_directory(File dir, String init_path)
 {
-    uint8_t status = REMOVE_DIR_ERROR;
+
+    // if the directory is empty => remove it
+    // else open the entry and get the next entry and get the name of the entry
+    // if the entry is a file remove it
+    // else if the entry is a folder - call itself by the entry name
+
+    uint8_t status = OKAY;
+    String root_path = "/";
 
     while (true)
     {
@@ -334,32 +325,23 @@ static uint8_t remove_directory(File dir, String temp_path)
         {
             if (entry.isDirectory())
             {
-                localpath = temp_path + entry.name() + rootpath + '\0';
+                localpath = init_path + entry.name() + root_path + '\0';
                 char folder_buf[localpath.length()];
                 localpath.toCharArray(folder_buf, localpath.length());
                 status = remove_directory(entry, folder_buf);
 
-                if (SD.rmdir(folder_buf))
-                {
-                    status = OKAY;
-                }
-                else
+                if (!SD.rmdir(folder_buf))
                 {
                     status = REMOVE_DIR_ERROR;
                 }
             }
             else
             {
-                Serial.println(localpath);
-                localpath = temp_path + entry.name() + '\0';
+                localpath = init_path + entry.name() + '\0';
                 char char_buf[localpath.length()];
                 localpath.toCharArray(char_buf, localpath.length());
 
-                if (SD.remove(char_buf))
-                {
-                    status = OKAY;
-                }
-                else
+                if (!SD.remove(char_buf))
                 {
                     status = REMOVE_FILE_ERROR;
                 }
@@ -371,5 +353,6 @@ static uint8_t remove_directory(File dir, String temp_path)
             break;
         }
     }
+
     return status;
 }
