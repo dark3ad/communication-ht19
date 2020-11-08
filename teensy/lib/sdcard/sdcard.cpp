@@ -13,7 +13,10 @@
 #include <string.h>
 #include <stdbool.h>
 
-static uint8_t remove_directory(File entry, String init_path);
+#define ROOT_PATH "/"
+#define DIR_VALUE_EXPAND 128
+
+static uint8_t remove_directory(File dir, char *init_dir);
 static uint8_t erase_memory(void);
 
 static uint32_t volumesize;
@@ -245,14 +248,12 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
 
 static uint8_t erase_memory(void)
 {
-
     // Open the entry
     // If it is a file => check if not valid => remove it
     // else if it is a folder and it is empty => remove it otherwise go to the first step
 
     File entry;
     File root = SD.open("/");
-    String root_path = "/";
 
     while (entry = root.openNextFile())
     {
@@ -260,8 +261,12 @@ static uint8_t erase_memory(void)
 
         if (entry.isDirectory())
         {
-            String init_path = root_path + entry.name() + root_path;
-            remove_directory(entry, init_path);
+            char init_dir[DIR_VALUE_EXPAND] = {};
+            strcpy(init_dir, ROOT_PATH);
+            strcat(init_dir, entry_name);
+            strcat(init_dir, ROOT_PATH);
+
+            remove_directory(entry, init_dir);
 
             if (!SD.rmdir(entry_name))
             {
@@ -305,43 +310,42 @@ static uint8_t erase_memory(void)
     return OKAY;
 }
 
-static uint8_t remove_directory(File dir, String init_path)
+static uint8_t remove_directory(File dir, char *init_dir)
 {
-
     // if the directory is empty => remove it
     // else open the entry and get the next entry and get the name of the entry
     // if the entry is a file remove it
     // else if the entry is a folder - call itself by the entry name
 
     uint8_t status = OKAY;
-    String root_path = "/";
 
     while (true)
     {
         File entry = dir.openNextFile();
-        String localpath;
+        char *entry_name = entry.name();
+        char localpath[DIR_VALUE_EXPAND] = {};
 
         if (entry)
         {
             if (entry.isDirectory())
             {
-                localpath = init_path + entry.name() + root_path + '\0';
-                char folder_buf[localpath.length()];
-                localpath.toCharArray(folder_buf, localpath.length());
-                status = remove_directory(entry, folder_buf);
+                strcpy(localpath, init_dir);
+                strcat(localpath, entry_name);
+                strcat(localpath, ROOT_PATH);
 
-                if (!SD.rmdir(folder_buf))
+                status = remove_directory(entry, localpath);
+
+                if (!SD.rmdir(localpath))
                 {
                     status = REMOVE_DIR_ERROR;
                 }
             }
             else
             {
-                localpath = init_path + entry.name() + '\0';
-                char char_buf[localpath.length()];
-                localpath.toCharArray(char_buf, localpath.length());
+                strcpy(localpath, init_dir);
+                strcat(localpath, entry_name);
 
-                if (!SD.remove(char_buf))
+                if (!SD.remove(localpath))
                 {
                     status = REMOVE_FILE_ERROR;
                 }
