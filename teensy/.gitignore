@@ -1,4 +1,5 @@
 .pio
 build
+canbus
 .vscode
 include/common.h
