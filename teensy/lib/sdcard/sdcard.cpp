@@ -16,14 +16,14 @@
 #define ROOT_PATH "/"
 #define DIR_VALUE_EXPAND 128
 
-static uint8_t remove_directory(File dir, char *init_dir);
+static uint8_t remove_directory(char *init_dir);
 static uint8_t erase_memory(void);
 
 static uint32_t volumesize;
 
-SdVolume volume; // FLYTTA TILL INIT-FUNKTIONEN & DEBUGGA, NÄR ALLT ANNAT ÄR ÅTGÄRDAT
-Sd2Card card;    // FLYTTA TILL INIT-FUNKTIONEN & DEBUGGA, NÄR ALLT ANNAT ÄR ÅTGÄRDAT
-SdFile root;     // FLYTTA TILL INIT-FUNKTIONEN & DEBUGGA, NÄR ALLT ANNAT ÄR ÅTGÄRDAT
+SdVolume volume; // DONT WORK WHEN LOCAL IN INIT FUNCTION
+Sd2Card card;    // DONT WORK WHEN LOCAL IN INIT FUNCTION
+SdFile root;     // DONT WORK WHEN LOCAL IN INIT FUNCTION
 
 uint8_t sdcard_init(void)
 {
@@ -174,7 +174,7 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
 
     static uint32_t position = 0xFFFFFFFFU;
     uint8_t i = strlen(file_name);
-    char temp[i + 1] = {0};
+    char root[i + 1] = {0};
 
     if (!SD.exists(file_name))
     {
@@ -185,10 +185,10 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
         }
 
         i = 0;
-        strcpy(temp, file_name);
-        while (temp[i])
+        strcpy(root, file_name);
+        while (root[i])
         {
-            temp[i] = toupper(file_name[i]);
+            root[i] = toupper(file_name[i]);
             i++;
         }
     }
@@ -196,21 +196,21 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
     if (SD.exists(file_name))
     {
         i = 0;
-        strcpy(temp, file_name);
-        while (temp[i])
+        strcpy(root, file_name);
+        while (root[i])
         {
-            temp[i] = toupper(file_name[i]);
+            root[i] = toupper(file_name[i]);
             i++;
         }
     }
 
-    if (!SD.exists(temp))
+    if (!SD.exists(root))
     {
         position = 0xFFFFFFFFU;
         return FILE_NOT_EXIST;
     }
 
-    File entry = SD.open(temp);
+    File entry = SD.open(root);
     if (!entry)
     {
         position = 0xFFFFFFFFU;
@@ -248,10 +248,6 @@ uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
 
 static uint8_t erase_memory(void)
 {
-    // Open the entry
-    // If it is a file => check if not valid => remove it
-    // else if it is a folder and it is empty => remove it otherwise go to the first step
-
     File entry;
     File root = SD.open("/");
 
@@ -264,11 +260,10 @@ static uint8_t erase_memory(void)
             char init_dir[DIR_VALUE_EXPAND] = {};
             strcpy(init_dir, ROOT_PATH);
             strcat(init_dir, entry_name);
-            strcat(init_dir, ROOT_PATH);
 
-            remove_directory(entry, init_dir);
+            remove_directory(init_dir);
 
-            if (!SD.rmdir(entry_name))
+            if (SD.exists(entry_name))
             {
                 entry.close();
                 return REMOVE_DIR_ERROR;
@@ -287,7 +282,7 @@ static uint8_t erase_memory(void)
                 for (uint8_t i = 1; i <= DAYS; i++)
                 {
                     char name[FILE_LENGTH] = {};
-                    sprintf(name, "%d", i); // sprintf(name, "%02d", i); <-- DELETES everything under 10 due to %02d, correction to %d
+                    sprintf(name, "%d", i);
                     if (!strcmp(name, entry_name))
                     {
                         is_valid = true;
@@ -310,46 +305,43 @@ static uint8_t erase_memory(void)
     return OKAY;
 }
 
-static uint8_t remove_directory(File dir, char *init_dir)
+static uint8_t remove_directory(char *init_dir)
 {
-    // if the directory is empty => remove it
-    // else open the entry and get the next entry and get the name of the entry
-    // if the entry is a file remove it
-    // else if the entry is a folder - call itself by the entry name
+    File root = SD.open(init_dir);
 
-    uint8_t status = OKAY;
-
+    if (!root)
+    {
+        return OPEN_DIR_ERROR;
+    }
     while (true)
     {
-        File entry = dir.openNextFile();
-        char *entry_name = entry.name();
-        char localpath[DIR_VALUE_EXPAND] = {};
+        File entry = root.openNextFile();
 
         if (entry)
         {
+            char *entry_name = entry.name();
+            char path[DIR_VALUE_EXPAND] = {};
+
             if (entry.isDirectory())
             {
-                strcpy(localpath, init_dir);
-                strcat(localpath, entry_name);
-                strcat(localpath, ROOT_PATH);
-
-                status = remove_directory(entry, localpath);
-
-                if (!SD.rmdir(localpath))
-                {
-                    status = REMOVE_DIR_ERROR;
-                }
+                strcpy(path, init_dir);
+                strcat(path, ROOT_PATH);
+                strcat(path, entry_name);
+                strcat(path, ROOT_PATH);
+                entry.close();
+                remove_directory(path);
             }
             else
             {
-                strcpy(localpath, init_dir);
-                strcat(localpath, entry_name);
-
-                if (!SD.remove(localpath))
-                {
-                    status = REMOVE_FILE_ERROR;
-                }
+                char path_file[DIR_VALUE_EXPAND] = {};
+                strcpy(path_file, init_dir);
+                strcat(path_file, ROOT_PATH);
+                strcat(path_file, entry_name);
+                SD.remove(path_file);
             }
+            SD.rmdir(path);
+
+            entry.close();
         }
         else
         {
@@ -357,6 +349,11 @@ static uint8_t remove_directory(File dir, char *init_dir)
             break;
         }
     }
+    if (!SD.rmdir(init_dir))
+    {
+        root.close();
+        return REMOVE_DIR_ERROR;
+    }
 
-    return status;
+    return OKAY;
 }
