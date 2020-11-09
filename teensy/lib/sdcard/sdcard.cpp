@@ -8,54 +8,50 @@
  * @copyright Copyright (c) 2020
  * 
  */
+
 #include <SD.h>
+#include <bsp.h>
 #include <sdcard.h>
-#include <string.h>
 #include <stdbool.h>
+#include <bsp_time.h>
 
 #define ROOT_PATH "/"
-#define DIR_VALUE_EXPAND 128
+#define DIR_VALUE_EXPAND (256U)
 
-static uint8_t remove_directory(char *init_dir);
 static uint8_t erase_memory(void);
+static bool check_file_name(const char *name);
+static uint8_t remove_directory(char *init_dir);
+static void date_time(uint16_t *date, uint16_t *time);
 
 static uint32_t volumesize;
 
-SdVolume volume; // DONT WORK WHEN LOCAL IN INIT FUNCTION
-Sd2Card card;    // DONT WORK WHEN LOCAL IN INIT FUNCTION
-SdFile root;     // DONT WORK WHEN LOCAL IN INIT FUNCTION
-
 uint8_t sdcard_init(void)
 {
+    SdFile root;
+    Sd2Card card;
+    SdVolume volume;
+    uint8_t status = SDCARD_BEGIN_ERROR;
 
-    if (!SD.begin(BUILTIN_SDCARD))
+    if (card.init(SPI_HALF_SPEED, BUILTIN_SDCARD) && volume.init(card) && root.openRoot(volume))
     {
-        return SDCARD_BEGIN_ERROR;
+        volumesize = volume.blocksPerCluster();
+        volumesize *= volume.clusterCount();
+        volumesize /= 2048;
+
+        if (SD.begin(BUILTIN_SDCARD))
+        {
+            status = erase_memory();
+        }
     }
 
-    if (!card.init(SPI_HALF_SPEED, BUILTIN_SDCARD))
-    {
-        return SDCARD_BEGIN_ERROR;
-    }
-
-    if (!volume.init(card))
-    {
-        return SDCARD_BEGIN_ERROR;
-    }
-
-    volumesize = volume.blocksPerCluster();
-    volumesize *= volume.clusterCount();
-    volumesize /= 2;
-    volumesize /= 1024;
-
-    return erase_memory();
+    return status;
 }
 
 uint16_t sdcard_get_free_space(void)
 {
-    uint32_t size_used = 0;
-    File root = SD.open("/");
     File entry;
+    uint32_t size_used = 0;
+    File root = SD.open(ROOT_PATH);
 
     if (!root)
     {
@@ -80,7 +76,7 @@ uint16_t sdcard_get_free_space(void)
 filelist_t sdcard_get_files_list(void)
 {
     filelist_t result = {};
-    File root = SD.open("/");
+    File root = SD.open(ROOT_PATH);
 
     if (!root)
     {
@@ -91,7 +87,7 @@ filelist_t sdcard_get_files_list(void)
         uint8_t j = 0;
         for (uint8_t i = 1; i <= DAYS; i++)
         {
-            char name[3] = {};
+            char name[FILE_LENGTH] = {};
             sprintf(name, "%02d", i);
             if (SD.exists(name))
             {
@@ -105,255 +101,263 @@ filelist_t sdcard_get_files_list(void)
             strcpy(result.errors, ERROR_LOG);
         }
 
-        result.status = OKAY;
+        result.status = SUCCESS;
     }
     root.close();
 
     return result;
 }
 
-uint8_t sdcard_delete_file(const char *file_name)
-{
-    if (!SD.exists(file_name))
-    {
-        return FILE_NOT_EXIST;
-    }
-    else
-    {
-        SD.remove(file_name);
-        if (SD.exists(file_name))
-        {
-            return REMOVE_FILE_ERROR;
-        }
-    }
-
-    return OKAY;
-}
-
 uint8_t sdcard_create_file(const char *file_name)
 {
-    if (SD.exists(file_name))
-    {
-        return CREATE_FILE_ERROR;
-    }
-    else
-    {
-        File entry = SD.open(file_name, FILE_WRITE);
-        entry.close();
+    uint8_t status = INVALID_FILE_NAME;
 
-        if (!SD.exists(file_name))
+    if (check_file_name(file_name))
+    {
+        if (SD.exists(file_name))
         {
-            return CREATE_FILE_ERROR;
+            status = FILE_EXIST;
+        }
+        else
+        {
+            SdFile::dateTimeCallback(date_time);
+            File file = SD.open(file_name, O_CREAT | O_WRITE);
+            if (file)
+            {
+                file.close();
+                status = SUCCESS;
+            }
+            else
+            {
+                status = CREATE_FILE_ERROR;
+            }
         }
     }
 
-    return OKAY;
+    return status;
+}
+
+uint8_t sdcard_delete_file(const char *file_name)
+{
+    uint8_t status = FILE_NOT_EXIST;
+
+    if (SD.exists(file_name))
+    {
+        status = SD.remove(file_name) ? SUCCESS : REMOVE_FILE_ERROR;
+    }
+
+    return status;
 }
 
 uint8_t sdcard_append_file(const char *file_name, const char *text)
 {
-    File entry = SD.open(file_name, FILE_WRITE);
-
-    if (!entry)
+    uint8_t status = SUCCESS;
+    if (!check_file_name(file_name))
     {
-        entry.close();
-
-        return WRITE_FILE_ERROR;
+        status = INVALID_FILE_NAME;
+    }
+    else if (!SD.exists(file_name))
+    {
+        status = FILE_NOT_EXIST;
     }
     else
     {
-        entry.print(text);
-        entry.close();
+        File file = SD.open(file_name, FILE_WRITE);
+        if (!file)
+        {
+            status = OPEN_FILE_ERROR;
+        }
+        else
+        {
+            if (strlen(text) != file.print(text))
+            {
+                status = WRITE_FILE_ERROR;
+            }
+            file.close();
+        }
     }
 
-    return OKAY;
+    return status;
 }
 
-uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length)
+uint8_t sdcard_read_file(const char *name, char *buffer, uint16_t length)
 {
-
+    uint8_t status = SUCCESS;
     static uint32_t position = 0xFFFFFFFFU;
-    uint8_t i = strlen(file_name);
-    char root[i + 1] = {0};
 
-    if (!SD.exists(file_name))
-    {
-        if ((i != 2) && (i != strlen(ERROR_LOG)))
-        {
-            position = 0xFFFFFFFFU;
-            return FILE_NOT_EXIST;
-        }
-
-        i = 0;
-        strcpy(root, file_name);
-        while (root[i])
-        {
-            root[i] = toupper(file_name[i]);
-            i++;
-        }
-    }
-
-    if (SD.exists(file_name))
-    {
-        i = 0;
-        strcpy(root, file_name);
-        while (root[i])
-        {
-            root[i] = toupper(file_name[i]);
-            i++;
-        }
-    }
-
-    if (!SD.exists(root))
+    if (!check_file_name(name))
     {
         position = 0xFFFFFFFFU;
-        return FILE_NOT_EXIST;
+        status = INVALID_FILE_NAME;
     }
-
-    File entry = SD.open(root);
-    if (!entry)
+    else if (!SD.exists(name))
     {
         position = 0xFFFFFFFFU;
-        return OPEN_FILE_ERROR;
-    }
-
-    position = (position == 0xFFFFFFFFU) ? 0 : (position + length - 1);
-
-    if (position > entry.size())
-    {
-        entry.close();
-        position = 0xFFFFFFFFU;
+        status = FILE_NOT_EXIST;
     }
     else
     {
-        entry.seek(position);
-        if (entry.available())
-        {
-            if (entry.read(buffer, length - 1) < 0)
-            {
-                entry.close();
-                position = 0xFFFFFFFFU;
-                return READ_FILE_ERROR;
-            }
-        }
-        else
+        File file = SD.open(name);
+        if (!file)
         {
             position = 0xFFFFFFFFU;
-        }
-        entry.close();
-    }
-
-    return OKAY;
-}
-
-static uint8_t erase_memory(void)
-{
-    File entry;
-    File root = SD.open("/");
-
-    while (entry = root.openNextFile())
-    {
-        char *entry_name = entry.name();
-
-        if (entry.isDirectory())
-        {
-            char init_dir[DIR_VALUE_EXPAND] = {};
-            strcpy(init_dir, ROOT_PATH);
-            strcat(init_dir, entry_name);
-
-            remove_directory(init_dir);
-
-            if (SD.exists(entry_name))
-            {
-                entry.close();
-                return REMOVE_DIR_ERROR;
-            }
+            status = OPEN_FILE_ERROR;
         }
         else
         {
-            bool is_valid = false;
-            if (!strcmp(ERROR_LOG, entry_name))
+            memset(buffer, 0, length);
+            position = (position == 0xFFFFFFFFU) ? 0 : (position + length - 1);
+
+            if (position > file.size())
             {
-                is_valid = true;
+                position = 0xFFFFFFFFU;
             }
             else
             {
-
-                for (uint8_t i = 1; i <= DAYS; i++)
+                file.seek(position);
+                if (file.available())
                 {
-                    char name[FILE_LENGTH] = {};
-                    sprintf(name, "%d", i);
-                    if (!strcmp(name, entry_name))
+                    if (file.read(buffer, length - 1) < 0)
                     {
-                        is_valid = true;
-                        break;
+                        position = 0xFFFFFFFFU;
+                        status = READ_FILE_ERROR;
                     }
                 }
-            }
-            if (!is_valid)
-            {
-                if (!SD.remove(entry_name))
+                else
                 {
-                    entry.close();
-                    return REMOVE_FILE_ERROR;
+                    position = 0xFFFFFFFFU;
+                    status = READ_FILE_ERROR;
                 }
             }
+            file.close();
         }
-        entry.close();
     }
-    root.close();
-    return OKAY;
+
+    return status;
+}
+
+/**
+ * @brief This function is used to remove all the invalid files and directories.
+ * @remark The function can not remove read-only files and directories.
+ * 
+ * @return uint8_t The status code: SUCCESS | OPEN_DIR_ERROR | REMOVE_FILE_ERROR | OPEN_DIR_ERROR | REMOVE_DIR_ERROR
+ */
+static uint8_t erase_memory(void)
+{
+    uint8_t status = SUCCESS;
+    File root = SD.open(ROOT_PATH);
+
+    if (!root)
+    {
+        status = OPEN_DIR_ERROR;
+    }
+    else
+    {
+        File entry;
+        while (entry = root.openNextFile())
+        {
+            char *name = entry.name();
+            if (entry.isDirectory())
+            {
+                status = remove_directory(name);
+            }
+            else if (!check_file_name(name))
+            {
+                if (!SD.remove(name))
+                {
+                    status = REMOVE_FILE_ERROR;
+                }
+            }
+            entry.close();
+
+            if (status != SUCCESS)
+            {
+                break;
+            }
+        }
+        root.close();
+    }
+
+    return status;
 }
 
 static uint8_t remove_directory(char *init_dir)
 {
-    File root = SD.open(init_dir);
-
-    if (!root)
+    if (!SD.rmdir(init_dir))
     {
-        return OPEN_DIR_ERROR;
-    }
-    while (true)
-    {
-        File entry = root.openNextFile();
+        File root = SD.open(init_dir);
 
-        if (entry)
+        if (!root)
         {
-            char *entry_name = entry.name();
-            char path[DIR_VALUE_EXPAND] = {};
+            return OPEN_DIR_ERROR;
+        }
+
+        File entry;
+
+        while (entry = root.openNextFile())
+        {
+            uint8_t status = SUCCESS;
+            char entry_name[DIR_VALUE_EXPAND] = {};
+
+            strcpy(entry_name, init_dir);
+            strcat(entry_name, ROOT_PATH);
+            strcat(entry_name, entry.name());
 
             if (entry.isDirectory())
             {
-                strcpy(path, init_dir);
-                strcat(path, ROOT_PATH);
-                strcat(path, entry_name);
-                strcat(path, ROOT_PATH);
-                entry.close();
-                remove_directory(path);
+                status = remove_directory(entry_name);
             }
-            else
+            else if (!SD.remove(entry_name))
             {
-                char path_file[DIR_VALUE_EXPAND] = {};
-                strcpy(path_file, init_dir);
-                strcat(path_file, ROOT_PATH);
-                strcat(path_file, entry_name);
-                SD.remove(path_file);
+                PRINTF("[F] Failed to remove %s\n", entry_name);
+                status = REMOVE_FILE_ERROR;
             }
-            SD.rmdir(path);
+            entry.close();
+
+            if (SUCCESS != status)
+            {
+                return status;
+            }
 
             entry.close();
         }
-        else
-        {
-            entry.close();
-            break;
-        }
-    }
-    if (!SD.rmdir(init_dir))
-    {
         root.close();
-        return REMOVE_DIR_ERROR;
+
+        if (!SD.rmdir(init_dir))
+        {
+            PRINTF("[D] Failed to remove %s\n", init_dir);
+            return REMOVE_DIR_ERROR;
+        }
     }
 
-    return OKAY;
+    return SUCCESS;
+}
+
+static bool check_file_name(const char *name)
+{
+    bool valid = false;
+    if (!strcmp(name, ERROR_LOG))
+    {
+        valid = true;
+    }
+    else
+    {
+        for (uint8_t i = 1; i <= DAYS; i++)
+        {
+            char temp[FILE_LENGTH] = {};
+            sprintf(temp, "%02d", i);
+            if (!strcmp(temp, name))
+            {
+                valid = true;
+                break;
+            }
+        }
+    }
+    return valid;
+}
+
+static void date_time(uint16_t *date, uint16_t *time)
+{
+    *date = FAT_DATE(bsp_year(), bsp_month(), bsp_day());
+    *time = FAT_TIME(bsp_hour(), bsp_minute(), bsp_second());
 }

@@ -14,16 +14,18 @@
 
 #include <stdint.h>
 
-#define OKAY 1
-#define SDCARD_BEGIN_ERROR 2
-#define CREATE_FILE_ERROR 3
-#define OPEN_FILE_ERROR 4
-#define FILE_NOT_EXIST 5
+#define SUCCESS 1
+#define FILE_EXIST 2
+#define FILE_NOT_EXIST 3
+#define OPEN_DIR_ERROR 4
+#define OPEN_FILE_ERROR 5
 #define READ_FILE_ERROR 6
 #define WRITE_FILE_ERROR 7
-#define REMOVE_FILE_ERROR 8
-#define OPEN_DIR_ERROR 9
-#define REMOVE_DIR_ERROR 10
+#define REMOVE_DIR_ERROR 8
+#define INVALID_FILE_NAME 9
+#define CREATE_FILE_ERROR 10
+#define REMOVE_FILE_ERROR 11
+#define SDCARD_BEGIN_ERROR 12
 
 #define DAYS (31U)
 #define FILE_LENGTH (3U)
@@ -37,62 +39,58 @@ typedef struct
 } filelist_t;
 
 /**
- * @brief this function handles the initialisation of the buildin sdcard
+ * @brief This function handles the initialisation of the builtin SD card
  * 
- * @return uint8_t output of statuscode according to 
- *         macro(2 = SDCARD_BEGIN_ERROR, 1 = OKAY, 8 = REMOVE_FILE_ERROR, 10 = REMOVE_DIR_ERROR)
+ * @return uint8_t The status code: SUCCESS | SDCARD_BEGIN_ERROR | OPEN_DIR_ERROR | REMOVE_FILE_ERROR | OPEN_DIR_ERROR | REMOVE_DIR_ERROR
  */
 uint8_t sdcard_init(void);
 
 /**
- * @brief this function check the amount of (Mb) free space of the sdcard
+ * @brief This function check the amount of (Mb) free space of the SD card
  * 
- * @return uint16_t output integer of megabytes free space
+ * @return uint16_t The free space in megabytes
  */
 uint16_t sdcard_get_free_space(void);
 
 /**
- * @brief this function check what files are available on the sdcard and groups them in status, logs and errors
+ * @brief This function checks what files are available on the SD card and groups them in status, logs and errors
  * 
- * @return filelist_t output struct as uint8_t status, char logs 2D-array and char errors 1D-array and 
- *         statuscode according to macro(9 = OPEN_DIR_ERROR, 1 = OKAY)
+ * @return filelist_t The files (logs and errors) list and a status code: SUCCESS | OPEN_DIR_ERROR
  */
 filelist_t sdcard_get_files_list(void);
 
 /**
- * @brief this function delete desired file on sdcard
+ * @brief This function deletes desired file on the SD card
  * 
  * @param file_name input for filename to delete
- * @return uint8_t output statuscode according to 
- *         macro(5 = FILE_NOT_EXIST, 8 = REMOVE_FILE_ERROR, 1 = OKAY)
+ * @return uint8_t The status code: FILE_NOT_EXIST, REMOVE_FILE_ERROR, SUCCESS
  */
 uint8_t sdcard_delete_file(const char *file_name);
 
 /**
- * @brief this function create desired file on sdcard
+ * @brief This function creates desired file on the SD card
  * 
- * @param file_name input for filename to create
- * @return uint8_t output statuscode according to macro(3 = CREATE_FILE_ERROR, 1 = OKAY)
+ * @param file_name The filename to create
+ * @return uint8_t The status code: INVALID_FILE_NAME | FILE_EXIST | CREATE_FILE_ERROR | SUCCESS
  */
 uint8_t sdcard_create_file(const char *file_name);
 
 /**
- * @brief this function write content to desired file on sdcard
+ * @brief This function writes text to desired file on the SD card
  * 
- * @param file_name input for filename to write to
- * @param text input for desired text to write to file
- * @return uint8_t output statuscode according to macro(7 = WRITE_FILE_ERROR, 1 = OKAY)
+ * @param file_name The filename to write to
+ * @param text The text to write to the file
+ * @return uint8_t The status code: INVALID_FILE_NAME | FILE_NOT_EXIST | OPEN_FILE_ERROR | WRITE_FILE_ERROR | SUCCESS
  */
 uint8_t sdcard_append_file(const char *file_name, const char *text);
 
 /** 
- * @brief this function read content and length of desired file on sdcard
+ * @brief This function reads length bytes of data from a file on the SD card
  * 
- * @param file_name input for desired file to read
- * @param buffer input for desired buffer to read to
- * @param length input for desired length of bytes to read
- * @return uint8_t output statuscode according to 
- *         macro(5 = FILE_NOT_EXIST, 4 = OPEN_FILE_ERROR, 6 = READ_FILE_ERROR, 1 = OKAY)
+ * @param file_name The file to read
+ * @param buffer A buffer for the read data
+ * @param length The length of data
+ * @return uint8_t The status code: INVALID_FILE_NAME | FILE_NOT_EXIST | OPEN_FILE_ERROR | READ_FILE_ERROR | SUCCESS
  */
 uint8_t sdcard_read_file(const char *file_name, char *buffer, uint16_t length);
 
