@@ -13,9 +13,6 @@
 
 #include <stdint.h>
 
-#define ERROR (0U)
-#define OKAY (1U)
-
 /**
  * @brief This function is used to initialize the i2c_driver for master mode on esp32
  * 

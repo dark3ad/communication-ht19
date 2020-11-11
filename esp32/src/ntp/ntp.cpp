@@ -1,54 +1,49 @@
-#include "ntp.h"
+#include <ntp.h>
+#include <common.h>
 #include <wifi_driver.h>
 #include <i2c_driver.h>
 #include "time.h"
 
-const char *ntpServer = "pool.ntp.org";
-const long gmtOffset_sec = 3600;
-const int daylightOffset_sec = 3600;
+#define TIME_OFFSET (1 * 60 * 60)
+#define TIME_DAYLIGHT (1 * 60 * 60)
+#define NTP_ADDRESS "pool.ntp.org"
 
-uint8_t ntp_datetime_init(void)
+void ntp_datetime_init(void)
 {
+
+    uint8_t status = i2c_driver_init();
+    status = (status == OKAY) ? OKAY : I2C_ERROR;
+
     //connect to WiFi
-    Serial.printf("\n\nConnecting to %s ", SSID);
-    wifi_driver_init(SSID, PASSWORD);
-    while (wifi_driver_status() != CONNECTED)
-    {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("\nWifi CONNECTED\n");
+    wifi_driver_init();
+    wifi_driver_connect();
 
     //NTP init and get the time
-    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+    configTime(TIME_OFFSET, TIME_DAYLIGHT, NTP_ADDRESS);
 
-    return i2c_driver_init();
+    // set_esp32_status(status);    ??
 }
 
-uint8_t get_ntp_datetime(uint8_t *ntp)
+void get_ntp_datetime(char *ntp)
 {
+    uint8_t status = NTP_ERROR;
 
     struct tm timeinfo;
 
-    if (!getLocalTime(&timeinfo))
+    if (getLocalTime(&timeinfo))
     {
-        Serial.println("Failed to obtain time");
-        return ERROR;
+        strftime(ntp, DATE_TIME_LENGTH, "%Y-%m-%d %H:%M:%S", &timeinfo);
+        status = OKAY;
     }
 
-    strftime((char *)ntp, DATE_TIME_LENGTH, "%Y-%m-%d %H:%M:%S", &timeinfo);
-
-    return OKAY;
+    // set ntp status  ??
 }
 
-uint8_t send_ntp_datetime(uint8_t *datetime)
+void send_ntp_datetime(uint8_t *datetime)
 {
 
-    if (!i2c_driver_write(datetime))
-    {
-        Serial.printf("Failed to send\n");
-        return ERROR;
-    }
+    uint8_t status = i2c_driver_write(datetime);
+    status = (status == OKAY) ? OKAY : I2C_ERROR;
 
-    return OKAY;
+    // set_esp32_status(status);
 }
