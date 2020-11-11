@@ -1,0 +1,146 @@
+# The CAN Signals
+
+Output Signals                    | Type     | Length | Description                                      | Values
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+esp32_status                      | uint8_t  |    3   | The esp32 status                                 | UNINITIALIZED | OKAY | I2C_ERROR | NTP_ERROR | WIFI_DISCONNECTED | MQTT_DISCONNECTED | MQTT_PUBLISH_ERROR
+sdcard_status                     | uint8_t  |    2   | The SD card status                               | UNINITIALIZED | OKAY | ERROR
+sdcard_free_space                 | uint16_t |   11   | The SD card free space in mb                     | [0, 2048]
+terminal_status                   | uint8_t  |    2   | The SD card status                               | DISCONNECTED | CONNECTED | ERROR
+rtc_status                        | uint8_t  |    1   | The RTC status                                   | UNINITIALIZED | OKAY
+rtc_year                          | uint16_t |   11   | The current RTC year                             | [2020, 2040]
+rtc_month                         | uint8_t  |    4   | The current RTC month                            | [1, 12]
+rtc_day                           | uint8_t  |    5   | The current RTC day                              | [1, 31]
+rtc_hour                          | uint8_t  |    5   | The current RTC hour                             | [0, 23]
+rtc_minute                        | uint8_t  |    6   | The current RTC minute                           | [0, 59]
+rtc_second                        | uint8_t  |    6   | The current RTC second                           | [0, 59]
+lamp_state                        | uint8_t  |    1   | The lamp state                                   | OFF | ON
+overwrite_lamp_state              | bool     |    1   | Overwrite the lamp state                         | false | true
+heater_state                      | uint8_t  |    1   | The heater state                                 | OFF | ON
+overwrite_heater_state            | bool     |    1   | Overwrite the heater state                       | false | true
+water_pump_state                  | uint8_t  |    1   | The water pump state                             | OFF | ON
+overwrite_water_pump_state        | bool     |    1   | Overwrite the water pump state                   | false | true
+water_valve_state                 | uint8_t  |    1   | The water valve state                            | OFF | ON
+overwrite_water_valve_state       | bool     |    1   | Overwrite the water valve state                  | false | true
+window_ventilator_state           | uint8_t  |    1   | The window ventilator state                      | CLOSE | OPEN
+overwrite_window_ventilator_state | bool     |    1   | Overwrite the window ventilator state            | false | true
+fan_state                         | uint8_t  |    1   | The fan state                                    | OFF | ON
+overwrite_fan_state               | bool     |    1   | Overwrite the fan state                          | false | true
+temperature_cal_min_val           | uint8_t  |    6   | The minimum calibration value of temperature     | [0, 50]
+temperature_cal_max_val           | uint8_t  |    6   | The maximum calibration value of temperature     | [0, 50]
+humidity_cal_min_val              | uint8_t  |    6   | The minimum calibration value of humidity        | [0, 100]
+humidity_cal_max_val              | uint8_t  |    6   | The maximum calibration value of humidity        | [0, 100]
+flow_meter_cal_min_val            | uint16_t |    9   | The minimum calibration value of flow rate       | [17, 500]
+flow_meter_cal_max_val            | uint16_t |    9   | The maximum calibration value of flow rate       | [17, 500]
+temperature_target_min_val        | uint8_t  |    6   | The ambient minmum target temperature            | [0, 50]
+temperature_target_max_val        | uint8_t  |    6   | The ambient maximum target temperature           | [0, 50]
+humidity_target_min_val           | uint8_t  |    6   | The minmum target humidity                       | [0, 100]
+humidity_target_max_val           | uint8_t  |    6   | The maximum target humidity                      | [0, 100]
+flow_meter_target_min_val         | uint16_t |    9   | The minmum target flow rate                      | [17, 500]
+flow_meter_target_max_val         | uint16_t |    9   | The maximum target flow rate                     | [17, 500]
+light_intensity_target_min_val    | uint8_t  |    6   | The minmum target light intensity                | [0, 100]
+water_level_target_min_val        | uint8_t  |    6   | The minmum target water level                    | [0, 100]
+water_level_target_max_val        | uint8_t  |    6   | The maximum target water level                   | [0, 100]
+soil_moisture_target_min_val      | uint8_t  |    6   | The minimum target soil moisture                 | [0, 100]
+soil_moisture_target_max_val      | uint8_t  |    6   | The maximum target soil moisture                 | [0, 100]
+water_level_cal_max_val           | uint8_t  |    6   | The maximum calibration value of water level     | [0, 100]
+water_level_cal_min_val           | uint8_t  |    6   | The minmum calibration value of water level      | [0, 100]
+soil_moisture_cal_min_val         | uint8_t  |    6   | The minimum calibration value of soil moisture   | [0, 100]
+soil_moisture_cal_max_val         | uint8_t  |    6   | The maximum calibration value of soil moisture   | [0, 100]
+light_intensity_cal_min_val       | uint8_t  |    6   | The minimum calibration value of light intensity | [0, 100]
+light_intensity_cal_max_val       | uint8_t  |    6   | The maximum calibration value of light intensity | [0, 100]
+
+
+Input Signals                           | Type     | Length | Description                                                | Values
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+temperature                             | uint8_t  |    6   | The ambient temperature                                    | [0, 50]
+humidity                                | uint8_t  |    7   | The ambient humidity percentage                            | [0, 100]
+flow_rate                               | uint16_t |    9   | The flow rate in milliliter per second                     | [17, 500]
+light_intensity                         | uint8_t  |    7   | The light intensity percentage                             | [0, 100]
+water_level                             | uint8_t  |    7   | The water level percentage                                 | [0, 100]
+soil_moisture                           | uint8_t  |    7   | The soil moisture percentage                               | [0, 100]
+dht_sensor_status                       | uint8_t  |    2   | The dht sensor status                                      | UNINITIALIZED | OKAY | ERROR
+flow_meter_sensor_status                | uint8_t  |    2   | The flow meter sensor status                               | UNINITIALIZED | OKAY | ERROR
+light_intesity_sensor_status            | uint8_t  |    2   | The light intensity sensor status                          | UNINITIALIZED | OKAY | ERROR
+water_level_sensor_status               | uint8_t  |    2   | The water level sensor status                              | UNINITIALIZED | OKAY | ERROR
+soil_moisture_sensor_status             | uint8_t  |    2   | The soil moisture sensor status                            | UNINITIALIZED | OKAY | ERROR
+esp32_status                            | uint8_t  |    3   | The esp32 status                                           | UNINITIALIZED | OKAY | I2C_ERROR | NTP_ERROR | WIFI_DISCONNECTED | MQTT_DISCONNECTED | MQTT_PUBLISH_ERROR
+sdcard_status                           | uint8_t  |    2   | The SD card status                                         | UNINITIALIZED | OKAY | ERROR
+sdcard_free_space                       | uint16_t |   11   | The SD card free space in mb                               | [0, 2048]
+terminal_status                         | uint8_t  |    2   | The SD card status                                         | DISCONNECTED | CONNECTED | ERROR
+rtc_status                              | uint8_t  |    1   | The RTC status                                             | UNINITIALIZED | OKAY
+rtc_year                                | uint16_t |   11   | The current RTC year                                       | [2020, 2040]
+rtc_month                               | uint8_t  |    4   | The current RTC month                                      | [1, 12]
+rtc_day                                 | uint8_t  |    5   | The current RTC day                                        | [1, 31]
+rtc_hour                                | uint8_t  |    5   | The current RTC hour                                       | [0, 23]
+rtc_minute                              | uint8_t  |    6   | The current RTC minute                                     | [0, 59]
+rtc_second                              | uint8_t  |    6   | The current RTC second                                     | [0, 59]
+lamp_state                              | uint8_t  |    1   | The lamp state                                             | OFF | ON
+is_lamp_state_overwritten               | bool     |    1   | Is the lamp state overwritten?                             | false | true
+heater_state                            | uint8_t  |    1   | The heater state                                           | OFF | ON
+is_heater_state_overwritten             | bool     |    1   | Is the heater state overwritten?                           | false | true
+water_pump_state                        | uint8_t  |    1   | The water pump state                                       | OFF | ON
+is_water_pump_state_overwritten         | bool     |    1   | Is the water pump state overwritten?                       | false | true
+water_valve_state                       | uint8_t  |    1   | The water valve state                                      | OFF | ON
+is_water_valve_state_overwritten        | bool     |    1   | Is the water valve state overwritten?                      | false | true
+window_ventilator_state                 | uint8_t  |    1   | The window ventilator state                                | CLOSE | OPEN
+is_window_ventilator_state_overwritten  | bool     |    1   | Is the window ventilator state overwritten?                | false | true
+fan_state                               | uint8_t  |    1   | The fan state                                              | OFF | ON
+is_fan_state_overwritten                | bool     |    1   | Is the fan state overwritten?                              | false | true
+lamp_status                             | uint8_t  |    2   | The lamp status                                            | UNINITIALIZED | OKAY | ERROR
+heater_status                           | uint8_t  |    2   | The heater status                                          | UNINITIALIZED | OKAY | ERROR
+water_pump_status                       | uint8_t  |    2   | The water_pump status                                      | UNINITIALIZED | OKAY | ERROR
+water_valve_status                      | uint8_t  |    2   | The water_valve status                                     | UNINITIALIZED | OKAY | ERROR
+window_ventilator_status                | uint8_t  |    2   | The window ventilator status                               | UNINITIALIZED | OKAY | ERROR
+fan_status                              | uint8_t  |    2   | The fan status                                             | UNINITIALIZED | OKAY | ERROR
+display_status                          | uint8_t  |    2   | The display status                                         | UNINITIALIZED | OKAY | ERROR
+keypad_status                           | uint8_t  |    2   | The keypad status                                          | UNINITIALIZED | OKAY | ERROR
+buzzer_status                           | uint8_t  |    2   | The buzzer status                                          | UNINITIALIZED | OKAY | ERROR
+rgb_status                              | uint8_t  |    2   | The RGB LED status                                         | UNINITIALIZED | OKAY | ERROR
+epprom_status                           | uint8_t  |    2   | The epprom status                                          | UNINITIALIZED | OKAY | ERROR
+system_status                           | uint8_t  |    2   | The system status                                          | WARNING | OKAY | ERROR
+temperature_cal_min_val                 | uint8_t  |    6   | The minimum calibration value of temperature               | [0, 50]
+validate_temperature_cal_min_val        | bool     |    1   | Is the minimum calibration value of temperature valid?     | false | true
+temperature_cal_max_val                 | uint8_t  |    6   | The maximum calibration value of temperature               | [0, 50]
+validate_temperature_cal_max_val        | bool     |    1   | Is the maximum calibration value of temperature valid?     | false | true
+humidity_cal_min_val                    | uint8_t  |    6   | The minimum calibration value of humidity                  | [0, 100]
+validate_humidity_cal_min_val           | bool     |    1   | Is the minimum calibration value of humidity valid?        | false | true
+humidity_cal_max_val                    | uint8_t  |    6   | The maximum calibration value of humidity                  | [0, 100]
+validate_humidity_cal_max_val           | bool     |    1   | Is the maximum calibration value of humidity valid?        | false | true
+flow_meter_cal_min_val                  | uint16_t |    9   | The minimum calibration value of flow rate                 | [17, 500]
+validate_flow_meter_cal_min_val         | bool     |    1   | Is the minimum calibration value of flow rate valid?       | false | true
+flow_meter_cal_max_val                  | uint16_t |    9   | The maximum calibration value of flow rate                 | [17, 500]
+validate_flow_meter_cal_max_val         | bool     |    1   | Is the maximum calibration value of flow rate valid?       | false | true
+temperature_target_min_val              | uint8_t  |    6   | The ambient minmum target temperature                      | [0, 50]
+validate_temperature_target_min_val     | bool     |    1   | Is the ambient minmum target temperature valid?            | false | true
+temperature_target_max_val              | uint8_t  |    6   | The ambient maximum target temperature                     | [0, 50]
+validate_temperature_target_max_val     | bool     |    1   | Is the ambient maximum target temperature valid?           | false | true
+humidity_target_min_val                 | uint8_t  |    6   | The minmum target humidity                                 | [0, 100]
+validate_humidity_target_min_val        | bool     |    1   | Is the minmum target humidity valid?                       | false | true
+humidity_target_max_val                 | uint8_t  |    6   | The maximum target humidity                                | [0, 100]
+validate_humidity_target_max_val        | bool     |    1   | Is the maximum target humidity valid?                      | false | true
+flow_meter_target_min_val               | uint16_t |    9   | The minmum target flow rate                                | [17, 500]
+validate_flow_meter_target_min_val      | bool     |    1   | Is the minmum target flow rate valid?                      | false | true
+flow_meter_target_max_val               | uint16_t |    9   | The maximum target flow rate                               | [17, 500]
+validate_flow_meter_target_max_val      | bool     |    1   | Is the maximum target flow rate valid?                     | false | true
+light_intensity_target_min_val          | uint8_t  |    6   | The minmum target light intensity                          | [0, 100]
+validate_light_intensity_target_min_val | bool     |    1   | Is the minmum target light intensity valid?                | false | true
+water_level_target_min_val              | uint8_t  |    6   | The minmum target water level                              | [0, 100]
+validate_water_level_target_min_val     | bool     |    1   | Is the minmum target water level valid?                    | false | true
+water_level_target_max_val              | uint8_t  |    6   | The maximum target water level                             | [0, 100]
+validate_water_level_target_max_val     | bool     |    1   | Is the maximum target water level valid?                   | false | true
+soil_moisture_target_min_val            | uint8_t  |    6   | The minimum target soil moisture                           | [0, 100]
+validate_soil_moisture_target_min_val   | bool     |    1   | Is the minimum target soil moisture valid?                 | false | true
+soil_moisture_target_max_val            | uint8_t  |    6   | The maximum target soil moisture                           | [0, 100]
+validate_soil_moisture_target_max_val   | bool     |    1   | Is the maximum target soil moisture valid?                 | false | true
+water_level_cal_max_val                 | uint8_t  |    6   | The maximum calibration value of water level               | [0, 100]
+validate_water_level_cal_max_val        | bool     |    1   | Is the maximum calibration value of water level valid?     | false | true
+water_level_cal_min_val                 | uint8_t  |    6   | The minmum calibration value of water level                | [0, 100]
+validate_water_level_cal_min_val        | bool     |    1   | Is the minmum calibration value of water level valid?      | false | true
+soil_moisture_cal_min_val               | uint8_t  |    6   | The minimum calibration value of soil moisture             | [0, 100]
+validate_soil_moisture_cal_min_val      | bool     |    1   | Is the minimum calibration value of soil moisture valid?   | false | true
+soil_moisture_cal_max_val               | uint8_t  |    6   | The maximum calibration value of soil moisture             | [0, 100]
+validate_soil_moisture_cal_max_val      | bool     |    1   | Is the maximum calibration value of soil moisture valid?   | false | true
+light_intensity_cal_min_val             | uint8_t  |    6   | The minimum calibration value of light intensity           | [0, 100]
+validate_light_intensity_cal_min_val    | bool     |    1   | Is the minimum calibration value of light intensity valid? | false | true
+light_intensity_cal_max_val             | uint8_t  |    6   | The maximum calibration value of light intensity           | [0, 100]
+validate_light_intensity_cal_max_val    | bool     |    1   | Is the maximum calibration value of light intensity valid? | false | true
