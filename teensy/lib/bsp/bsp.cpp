@@ -9,3 +9,18 @@ void bsp_serial_begin(void)
     {
     }
 }
+
+void bsp_serial_write(const char *msg)
+{
+  Serial.write(msg);
+}
+
+char bsp_serial_read(void)
+{
+  return (char)Serial.read();
+}
+
+int bsp_serial_available(void)
+{
+  return Serial.available();
+}
