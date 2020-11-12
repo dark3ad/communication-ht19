@@ -4,7 +4,7 @@
 void setup()
 {
     bsp_serial_begin();
-    ntp_datetime_init();
+    ntp_init();
 }
 
 void loop()

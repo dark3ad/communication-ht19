@@ -20,19 +20,13 @@
  * @brief This function is used to connect the wifi, to initailize i2c driver 
  *         and to configure the ntp server
  */
-void ntp_datetime_init(void);
+void ntp_init(void);
 
 /**
- * @brief Get the ntp datetime object
- * @param char * variable in which datatime is stored
+ * @brief This function is used to send the date time to the teensy via 12c
+ *         and also the status message if there.
+ * 
  */
-void get_ntp_datetime(char *);
-
-/**
- * @brief This function is used to write the date time (from NTP) to the i2c slave(Teensy)
- * @param uint8_t * variable which contain date time which is supposed to be write.
- * @return uint8_t status. It can be OKAY or ERROR 
- */
-void send_ntp_datetime(uint8_t *);
+void ntp_run(void);
 
 #endif /* NTP_H */
