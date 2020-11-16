@@ -18,8 +18,8 @@
 /**
  * @brief This function is used to initialize the i2c_driver for master mode on esp32
  * 
- * @return true if initializatio is okay
- * @return false if initializatio is not okay
+ * @return true if initialization is okay
+ * @return false if initialization is not okay
  */
 bool i2c_driver_init(void);
 
@@ -27,9 +27,9 @@ bool i2c_driver_init(void);
  * @brief This function is used to write data to the slave(teensy)
  * 
  * @param data which is suppossed to be write to the slave(teensy)
- * @param size 
- * @return true 
- * @return false 
+ * @param size which is size of the data
+ * @return true if i2c write is succeeded
+ * @return false if i2c write is not succeeded
  */
 bool i2c_driver_write(uint8_t *data, size_t size);
 
@@ -38,9 +38,9 @@ bool i2c_driver_write(uint8_t *data, size_t size);
  * 
  * @param data which is suppossed to be read from the slave(teensy)
  * @param length which is size of the data
- * @return uint8_t status of the function. It can be ERROR or OKAY 
+ * @return true if i2c read is succeeded
+ * @return false if i2c read is not succeeded
  */
-
 bool i2c_driver_read(uint8_t *data, size_t length);
 
 #endif /* I2C_DRIVER_H */

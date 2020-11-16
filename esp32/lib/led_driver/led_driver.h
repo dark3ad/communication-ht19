@@ -8,7 +8,7 @@
  * @brief This function is used to initialized the builtin LED.
  * 
  * @return true if initialization is okay
- * @return false if initializatio is not okay
+ * @return false if initialization is not okay
  */
 bool led_driver_init(void);
 
