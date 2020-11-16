@@ -15,9 +15,6 @@
 #include <ctype.h>
 #include <stdint.h>
 
-#define OKAY 1U
-#define ERROR 0U
-
 /**
  * @brief This function is used to initialize the i2c_driver for slave mode(Teensy)
  * 
