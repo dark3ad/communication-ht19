@@ -4,38 +4,50 @@
  * @created     : tisdag nov 10, 2020 13:28:56 CET
  */
 
+#include <stdint.h>
 #include <terminal.h>
+#include <canbus.h>
 #include <common.h>
 
-static enum btn_type {
+enum btn_type {
   LINK,
   OVERWRITTE,
   READ
 };
 
-static typedef struct btn_t {
+struct btn_t {
   btn_type type;
-  char * label;
-  char * link;
+  const char * label;
+  const char * link;
   uint8_t visible;
 };
 
-static typedef struct menu_t {
-  char * label;
-  struct button_t * buttons;
+struct menu_t {
+  const char * label;
+  struct btn_t * buttons;
 };
 
-/* MAIN MENU BUTTONS & MENU */
-btn_t main_menu_snap = {LINK, "Get snapshop of the system", "snapshots"};
 
+/* MAIN MENU BUTTONS & MENU */
+static btn_t main_menu_btns[3];
+static menu_t main_menu;
+
+static menu_t * current_menu;
 
 int terminal_initialize(void)
 {
+  main_menu_btns[0] = {LINK, "Get snapshop of the system.", "snapshots", 1};
+  main_menu_btns[1] = {LINK, "Get list of logged files.", "logged_files", 1};
+  main_menu_btns[2] = {LINK, "Calibrate the system.", "calibration", 1};
+
+  main_menu = {"main_menu", main_menu_btns};
+  current_menu = &main_menu;
+
   // Check the CAN-bus status.
   // Todo: check the CAN-bus status.
 
   // Check the SD card status.
-  if(get_sdcard_status != OKAY)
+  if(get_sdcard_status() != OKAY)
   {
     // Then, turn it on, how hard can it be?
     set_sdcard_status(OKAY);
