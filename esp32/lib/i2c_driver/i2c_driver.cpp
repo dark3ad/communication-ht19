@@ -1,6 +1,7 @@
 
 #include <Wire.h>
 #include <Arduino.h>
+#include <common.h>
 #include <i2c_driver.h>
 
 #define SLAVE 0x00

@@ -1,13 +1,12 @@
 #include <bsp.h>
-#include <esp32.h>
+#include <ntp.h>
 
 void setup()
 {
     bsp_serial_begin();
-    esp32_init();
+    ntp_init();
 }
 
 void loop()
 {
-    esp32_run();
 }
