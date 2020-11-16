@@ -1,5 +1,4 @@
 #include <WiFi.h>
-#include <common.h>
 #include <wifi_driver.h>
 
 void wifi_driver_init(void)
@@ -7,9 +6,9 @@ void wifi_driver_init(void)
     WiFi.begin(SSID, PASSWORD);
 }
 
-uint8_t wifi_driver_status(void)
+bool wifi_driver_status(void)
 {
-    return (WiFi.status() != WL_CONNECTED) ? CONNECTED : DISCONNECTED;
+    return (WiFi.status() != WL_CONNECTED);
 }
 
 void wifi_driver_connect(void)

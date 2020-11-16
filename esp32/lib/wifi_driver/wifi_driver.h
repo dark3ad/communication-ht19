@@ -13,6 +13,7 @@
 #define WIFI_DRIVER_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define SSID "YA-OPEN"
 #define PASSWORD "utbildning2015"
@@ -30,10 +31,11 @@ void wifi_driver_init(void);
 void wifi_driver_connect(void);
 
 /**
- * @brief This function is used to check the status of the connection
+ * @brief This function is used to check the if there is a connection or not
  * 
- * @return uint8_t CONNECTED, if there is a connection. Otherwise DISCONNECTED
+ * @return true if the module is connected to Internet
+ * @return false  if the module is not connected to Internet
  */
-uint8_t wifi_driver_status(void);
+bool wifi_driver_status(void);
 
 #endif /* WIFI_DRIVER_H */

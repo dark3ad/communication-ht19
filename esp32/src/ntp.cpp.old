@@ -10,7 +10,6 @@
 
 void ntp_init(void)
 {
-
     uint8_t status = i2c_driver_init();
     status = (status == OKAY) ? OKAY : I2C_ERROR;
 

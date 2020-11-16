@@ -14,6 +14,5 @@ void bsp_digital_write(uint8_t pin, uint8_t val)
 
 uint8_t bsp_digital_read(uint8_t pin)
 {
-
     return digitalRead(pin);
 }
