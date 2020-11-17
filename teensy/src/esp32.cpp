@@ -83,4 +83,8 @@ static void handle_request(void)
 {
     char buffer[PAYLOADS_LENGTH] = {};
     get_payloads(buffer);
+
+    uint8_t status = i2c_driver_write((uint8_t *)buffer, sizeof(buffer));
+    status = (status == OKAY) ? OKAY : I2C_ERROR;
+    set_esp32_status(status);
 }
