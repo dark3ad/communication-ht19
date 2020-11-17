@@ -8,10 +8,6 @@
 
 // should remove these macros
 #define DATE_TIME_LENGTH 19
-#define TIME_OFFSET (1 * 60 * 60)
-#define TIME_DAYLIGHT (1 * 60 * 60)
-#define NTP_ADDRESS "pool.ntp.org"
-/*********************************/
 
 void setup()
 {
@@ -33,35 +29,28 @@ void setup()
     wifi_driver_init();
     wifi_driver_connect();
 
-    if (wifi_driver_status())
+    uint8_t status = NTP_ERROR;
+    while (status != OKAY)
     {
-        uint8_t status = NTP_ERROR;
-        while (status != OKAY)
+        struct tm timeinfo;
+        uint8_t datetime[DATE_TIME_LENGTH + 1] = {};
+
+        //NTP init and get the time
+        configTime(TIME_OFFSET, TIME_DAYLIGHT, NTP_ADDRESS);
+
+        // get time
+        if (getLocalTime(&timeinfo))
         {
-            struct tm timeinfo;
-            uint8_t datetime[DATE_TIME_LENGTH + 1] = {};
-
-            //NTP init and get the time
-            configTime(TIME_OFFSET, TIME_DAYLIGHT, NTP_ADDRESS);
-
-            // get time
-            if (getLocalTime(&timeinfo))
-            {
-                strftime((char *)datetime, DATE_TIME_LENGTH, "%Y-%m-%d %H:%M:%S", &timeinfo);
-                // write date time to teensy and set the status to okay
-                i2c_driver_write(datetime, sizeof(datetime));
-                status = OKAY;
-            }
-            else
-            {
-                // if time is not okay, send ntp error message to the teensy
-                i2c_driver_write((uint8_t *)NTP_ERROR, sizeof(NTP_ERROR));
-            }
+            strftime((char *)datetime, DATE_TIME_LENGTH, "%Y-%m-%d %H:%M:%S", &timeinfo);
+            // write date time to teensy and set the status to okay
+            i2c_driver_write(datetime, sizeof(datetime));
+            status = OKAY;
         }
-    }
-    else
-    { // send wifi disconnected message to the teensy
-        i2c_driver_write(uint8_t *)WIFI_DISCONNECTED, sizeof(WIFI_DISCONNECTED));
+        else
+        {
+            // if time is not okay, send ntp error message to the teensy
+            i2c_driver_write((uint8_t *)NTP_ERROR, sizeof(NTP_ERROR));
+        }
     }
 }
 
