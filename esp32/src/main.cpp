@@ -7,7 +7,7 @@
 #include <wifi_driver.h>
 
 // should remove these macros
-#define DATE_TIME_LENGTH 19
+#define DATE_TIME_LENGTH (19U)
 
 void setup()
 {
@@ -23,11 +23,15 @@ void setup()
             led_driver_turn_on();
             bsp_delay(500);
             led_driver_turn_off();
+            bsp_delay(500);
         }
     }
 
     wifi_driver_init();
     wifi_driver_connect();
+
+    //NTP init and get the time
+    configTime(TIME_OFFSET, TIME_DAYLIGHT, NTP_ADDRESS);
 
     uint8_t status = NTP_ERROR;
     while (status != OKAY)
@@ -35,15 +39,12 @@ void setup()
         struct tm timeinfo;
         uint8_t datetime[DATE_TIME_LENGTH + 1] = {};
 
-        //NTP init and get the time
-        configTime(TIME_OFFSET, TIME_DAYLIGHT, NTP_ADDRESS);
-
         // get time
         if (getLocalTime(&timeinfo))
         {
-            strftime((char *)datetime, DATE_TIME_LENGTH, "%Y-%m-%d %H:%M:%S", &timeinfo);
+            strftime((char *)datetime, sizeof(datetime), "%Y-%m-%d %H:%M:%S", &timeinfo);
             // write date time to teensy and set the status to okay
-            i2c_driver_write(datetime, sizeof(datetime));
+            i2c_driver_write(datetime, DATE_TIME_LENGTH);
             status = OKAY;
         }
         else
