@@ -37,10 +37,10 @@ bool i2c_driver_write(uint8_t *data, size_t size);
  * @brief This function is used to read data from the slave(teensy)
  * 
  * @param data which is suppossed to be read from the slave(teensy)
- * @param length which is size of the data
+ * @param size which is size of the data
  * @return true if i2c read is succeeded
  * @return false if i2c read is not succeeded
  */
-bool i2c_driver_read(uint8_t *data, size_t length);
+bool i2c_driver_read(uint8_t *data, size_t size);
 
 #endif /* I2C_DRIVER_H */

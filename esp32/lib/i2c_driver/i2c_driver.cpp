@@ -45,12 +45,12 @@ bool i2c_driver_write(uint8_t *data, size_t size)
     return status;
 }
 
-bool i2c_driver_read(uint8_t *data, size_t length)
+bool i2c_driver_read(uint8_t *data, size_t size)
 {
     bool status = false;
 
     // It returns last error
-    Wire.readTransmission(SLAVE, data, length, true);
+    Wire.readTransmission(SLAVE, data, size, true);
 
     if (!Wire.lastError())
     {
