@@ -2,9 +2,9 @@
 #include <bsp_io.h>
 #include <led_driver.h>
 
-uint8_t led_driver_init(void)
+bool led_driver_init(void)
 {
-    uint8_t status = ERROR;
+    bool status = false;
 
     bsp_pin_mode(LED_BUILTIN, OUTPUT);
 
@@ -12,33 +12,33 @@ uint8_t led_driver_init(void)
 
     if (LOW == bsp_digital_read(LED_BUILTIN))
     {
-        status = OKAY;
+        status = true;
     }
 
     return status;
 }
 
-uint8_t led_driver_turn_on(void)
+bool led_driver_turn_on(void)
 {
-    uint8_t status = ERROR;
+    bool status = false;
     bsp_digital_write(LED_BUILTIN, HIGH);
 
     if (HIGH == bsp_digital_read(LED_BUILTIN))
     {
-        status = OKAY;
+        status = true;
     }
 
     return status;
 }
 
-uint8_t led_driver_turn_off(void)
+bool led_driver_turn_off(void)
 {
-    uint8_t status = ERROR;
+    bool status = false;
     bsp_digital_write(LED_BUILTIN, LOW);
 
     if (LOW == bsp_digital_read(LED_BUILTIN))
     {
-        status = OKAY;
+        status = true;
     }
 
     return status;

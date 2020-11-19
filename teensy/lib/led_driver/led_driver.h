@@ -14,9 +14,6 @@
 
 #include <stdint.h>
 
-#define ERROR 0
-#define OKAY 1
-
 /**
  * @brief This function is used to initialize the led driver
  *         Set the pinmode output and set built_in_led off in the beginning.

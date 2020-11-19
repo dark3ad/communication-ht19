@@ -1,24 +1,40 @@
+/**
+ * @file wifi_driver.h
+ * @author Bengt Cruz (bengt.cruz@ya.se)
+ * @brief Wifi driver intended for ESP32 in GreenHouse project
+ * @version 0.1
+ * @date 2020-11-04
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
+
 #ifndef WIFI_DRIVER_H
 #define WIFI_DRIVER_H
 
-#define DISCONNECTED (0U)
-#define CONNECTED (1U)
+#include <stdint.h>
+#include <stdbool.h>
 
 /**
- * @brief driver to initialize the wifi connection on the esp32
+ * @brief This function is used to initialize the WiFi driver
  * 
- * @param ssid wifi ssid 
- * @param passwrd password to the wifi
- * 
- * @return status of the initialization
+ * @param ssid The WiFi SSID
+ * @param password The WiFi password
  */
-uint8_t wifi_driver_init(char *ssid, char *passwrd);
+void wifi_driver_init(const char *ssid, const char *password);
 
 /**
- * @brief This function is used to check the status of the connection
+ * @brief This function is used to connect to Internet.
  * 
- * @return uint8_t OKEY, if there is a connection. Otherwise ERROR
  */
-uint8_t wifi_driver_status(void);
+void wifi_driver_connect(void);
+
+/**
+ * @brief This function is used to check the if there is a connection or not
+ * 
+ * @return true if the module is connected to Internet
+ * @return false  if the module is not connected to Internet
+ */
+bool wifi_driver_status(void);
 
 #endif /* WIFI_DRIVER_H */

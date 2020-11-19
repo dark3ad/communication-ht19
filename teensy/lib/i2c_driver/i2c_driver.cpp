@@ -1,4 +1,5 @@
 #include <i2c_t3.h>
+#include <common.h>
 #include <i2c_driver.h>
 
 #define ADDRESS (0x00U)

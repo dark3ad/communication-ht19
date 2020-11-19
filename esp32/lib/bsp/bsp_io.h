@@ -11,20 +11,8 @@
 #define HIGH 1
 #endif
 
-#ifndef INPUT
-#define INPUT 0
-#endif
-
 #ifndef OUTPUT
 #define OUTPUT 2
-#endif
-
-#ifndef INPUT_PULLUP
-#define INPUT_PULLUP 2
-#endif
-
-#ifndef INPUT_PULLDOWN
-#define INPUT_PULLDOWN 3
 #endif
 
 #ifndef LED_BUILTIN
