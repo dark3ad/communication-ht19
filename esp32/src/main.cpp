@@ -6,8 +6,8 @@
 #include <led_driver.h>
 #include <wifi_driver.h>
 
-#define SSID "MaxPlus"
-#define PASS "AB77201106"
+#define SSID "YA-OPEN"
+#define PASS "utbildning2015"
 #define DATE_TIME_LENGTH (19U)
 
 void setup()
