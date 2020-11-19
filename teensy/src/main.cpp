@@ -9,5 +9,4 @@ void setup()
 
 void loop()
 {
-    esp32_run();
 }

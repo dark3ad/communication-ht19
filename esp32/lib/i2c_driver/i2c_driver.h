@@ -1,7 +1,7 @@
 /**
  * @file i2c_driver.h
  * @author PraveenaSiva (pravisiva757@gmail.com)
- * @brief  i2c driver is used for the application in master mode on esp32.
+ * @brief  I2C driver is used for the application in master mode on esp32.
  * @version 0.1
  * @date 2020-10-21
  * 

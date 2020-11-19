@@ -1,6 +1,6 @@
 /**
  * @file wifi_driver.h
- * @author your name (you@domain.com)
+ * @author Bengt Cruz (bengt.cruz@ya.se)
  * @brief Wifi driver intended for ESP32 in GreenHouse project
  * @version 0.1
  * @date 2020-11-04
@@ -15,14 +15,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define SSID "YA-OPEN"
-#define PASSWORD "utbildning2015"
-
 /**
  * @brief This function is used to initialize the WiFi driver
  * 
+ * @param ssid The WiFi SSID
+ * @param password The WiFi password
  */
-void wifi_driver_init(void);
+void wifi_driver_init(const char *ssid, const char *password);
 
 /**
  * @brief This function is used to connect to Internet.
