@@ -9,7 +9,7 @@
 #define TERMINAL_H
 
 int terminal_initialize(void);
-int terminal_run(const char cmd);
+int terminal_run(void);
 
 
 #endif /* end of include guard TERMINAL_H */
