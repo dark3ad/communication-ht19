@@ -59,8 +59,9 @@ void setup()
         {
             // Send ntp error message to the teensy
             i2c_driver_write(&status, sizeof(status));
-            bsp_delay(1000);
         }
+
+        bsp_delay(1000);
     }
 }
 
