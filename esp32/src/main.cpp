@@ -92,7 +92,7 @@ void loop()
         while (!client.connect(CLIENT_ID, USERNAME, PASSWORD))
         {
             Serial.print(".");
-            delay(1000);
+            bsp_delay(1000);
         }
     }
 
