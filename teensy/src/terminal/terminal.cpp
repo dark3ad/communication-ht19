@@ -11,12 +11,30 @@
 #include <common.h>
 #include <string.h>
 #include <bsp_io.h>
+#include <sdcard.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 #define READ_BUFFER_SIZE 64
 
 #define MAIN_MENU_SNAPSHOT 0
 #define MAIN_MENU_FILES 1
 #define MAIN_MENU_CALIBRATION 2
+
+#define CALIBRATION_MENU_TEMPERATURE 0
+#define CALIBRATION_MENU_HUMIDITY 1
+#define CALIBRATION_MENU_FLOW_METER 2
+#define CALIBRATION_MENU_WATER_LEVEL 3
+
+#define TEMP_MENU_SET_TARGET_MIN 0
+#define TEMP_MENU_SET_TARGET_MAX 1
+#define TEMP_MENU_SET_CALI_MIN 2
+#define TEMP_MENU_SET_CALI_MAX 3
+
+#define HUM_MENU_SET_TARGET_MIN 0
+#define HUM_MENU_SET_TARGET_MAX 1
+#define HUM_MENU_SET_CALI_MIN 2
+#define HUM_MENU_SET_CALI_MAX 3
 
 struct menu_t {
   const char * label;
@@ -32,13 +50,43 @@ static menu_t flow_meter_menu;
 static menu_t moisture_menu;
 static menu_t water_level_menu;
 static menu_t logged_files_menu;
+static menu_t calibration_menu;
 
 static menu_t * current_menu;
 static char input[READ_BUFFER_SIZE] = {0};
 
-static void load_calibrations(void * args)
+static void calibration_menu_presenter(void * args)
 {
+  printf("%d) Temperature.\n", CALIBRATION_MENU_TEMPERATURE);
+  printf("%d) Humidity.\n", CALIBRATION_MENU_HUMIDITY);
+  printf("%d) Flow Meter.\n", CALIBRATION_MENU_FLOW_METER);
+  printf("%d) Water Level.\n", CALIBRATION_MENU_WATER_LEVEL);
+  printf("b) Back to main menu.\n");
+  printf("q) Quit.\n");
 
+}
+
+static void calibration_menu_handler(void * args)
+{
+    uint8_t opt = strtol((const char *)args, NULL, 10);
+
+    switch(opt){
+        case CALIBRATION_MENU_TEMPERATURE:
+            current_menu = &temperature_menu;
+            break;
+        case CALIBRATION_MENU_HUMIDITY:
+            current_menu = &humidity_menu;
+            break;
+        case CALIBRATION_MENU_FLOW_METER:
+            current_menu = &flow_meter_menu;
+            break;
+        case CALIBRATION_MENU_WATER_LEVEL:
+            current_menu = &water_level_menu;
+            break;
+        default:
+            printf("Nope");
+            break;
+    }
 }
 
 static void get_snapshot(void * args)
@@ -100,30 +148,93 @@ static void humidity_menu_handler(void * args)
 
 static void humidity_menu_presenter(void * args)
 {
-
+  printf("%d) Set target min.\n", HUM_MENU_SET_TARGET_MIN);
+  printf("%d) Set target max.\n", HUM_MENU_SET_TARGET_MAX);
+  printf("%d) Set calibration min.\n", HUM_MENU_SET_CALI_MIN);
+  printf("%d) Set calibration max.\n", HUM_MENU_SET_CALI_MAX);
+  printf("b) Return to calibration.\n");
+  printf("q) Quit.\n");
+  printf("> ");
 }
 
 static void temperature_menu_handler(void * args)
 {
+    uint8_t opt = strtol((const char *)args, NULL, 10);
+    char input[3];
 
+    switch(opt) 
+    {
+    case TEMP_MENU_SET_TARGET_MAX:
+        printf("Enter target max:");
+        bsp_serial_read(input);
+
+        opt = strtol(input, NULL, 10);
+        set_temperature_target_max(opt);
+        break;
+    case TEMP_MENU_SET_TARGET_MIN:
+        printf("Enter target min:");
+        bsp_serial_read(input);
+
+        opt = strtol(input, NULL, 10);
+        set_temperature_target_min(opt);
+        break;
+    case TEMP_MENU_SET_CALI_MIN:
+        printf("Enter calibration min:");
+        bsp_serial_read(input);
+
+        opt = strtol(input, NULL, 10);
+        set_temperature_calibration_min(opt);
+        break;
+    case TEMP_MENU_SET_CALI_MAX:
+        printf("Enter calibration max:");
+        bsp_serial_read(input);
+
+        opt = strtol(input, NULL, 10);
+        set_temperature_calibration_max(opt);
+        break;
+    default:
+        break;
+    }
 }
 
 static void temperature_menu_presenter(void * args)
 {
-
+  printf("%d) Set target min.\n", TEMP_MENU_SET_TARGET_MIN);
+  printf("%d) Set target max.\n", TEMP_MENU_SET_TARGET_MAX);
+  printf("%d) Set calibration min.\n", TEMP_MENU_SET_CALI_MIN);
+  printf("%d) Set calibration max.\n", TEMP_MENU_SET_CALI_MAX);
+  printf("b) Return to calibration.\n");
+  printf("q) Quit.\n");
+  printf("> ");
 }
 
 static void logged_files_menu_handler(void * args)
 {
-
+  char * name = (char *)args;
+  filelist_t list = sdcard_get_files_list();
+  char buffer[255] = {};
+  for(uint8_t i = 0; i < 2; i++)
+  {
+    if(memcmp(list.logs[i], args, sizeof(char) * 2) == 0)
+    {
+      sdcard_read_file(list.logs[i], buffer, 13);
+      printf("%s\n", buffer);
+      return;
+    }
+  }
+  printf("Could not find file");
 }
 
 static void logged_files_menu_presenter(void * args)
 {
-  printf("%d) \n", MAIN_MENU_SNAPSHOT);
+  filelist_t list = sdcard_get_files_list();
+  for(uint8_t i = 0; i < 2; i++)
+  {
+    printf("%s\n", list.logs[i]);
+  }
+  printf("b) Return to main menu.\n");
   printf("q) Quit.\n");
   printf("> ");
-
 }
 
 static void main_menu_presenter(void * args)
@@ -137,19 +248,17 @@ static void main_menu_presenter(void * args)
 
 static void main_menu_handler(void * args)
 {
-  int *opt = (int *)args;
-  *opt = *opt - 0 - 48;
+  uint8_t opt = strtol((const char*)args, NULL, 10);
 
-  switch(*opt) {
+  switch(opt) {
     case MAIN_MENU_SNAPSHOT:
       get_snapshot(args);
       break;
     case MAIN_MENU_FILES:
-      printf("Hello?");
       current_menu = &logged_files_menu;
       break;
     case MAIN_MENU_CALIBRATION:
-      load_calibrations(args);
+      current_menu = &calibration_menu;
       break;
     default:
       break;
@@ -161,19 +270,16 @@ int terminal_initialize(void)
 
   main_menu = {"main_menu", main_menu_presenter, main_menu_handler};
   logged_files_menu = {"logged_files", logged_files_menu_presenter, logged_files_menu_handler};
+  calibration_menu = {"calibration", calibration_menu_presenter, calibration_menu_handler};
+  temperature_menu = {"temperature_menu", temperature_menu_presenter, temperature_menu_handler};
   current_menu = &main_menu;
 
-  // Check the CAN-bus status.
-  // Todo: check the CAN-bus status.
-
   // Check the SD card status.
-  /*
   if(get_sdcard_status() != OKAY)
   {
     // Then, turn it on, how hard can it be?
-    set_sdcard_status(OKAY);
+    // set_sdcard_status(OKAY);
   }
-  */
   
   // Everything is fine, you are good to go!
   return 0;
@@ -181,18 +287,16 @@ int terminal_initialize(void)
 
 int terminal_run(void)
 {
-  while(memcmp(input, "q", 1) != 0)
+  while(true)
   {
     // Display the current menu.
-    uint8_t i = 0;
     printf("---- THE GREENHOUSE ----\n");
 
     current_menu->presenter(NULL);
 
-    int char_count = 0;
     if(bsp_serial_available())
     {
-      input[char_count] = bsp_serial_read();
+      bsp_serial_read(input);
     }
 
     if(memcmp(input, "q", 1) == 0)
