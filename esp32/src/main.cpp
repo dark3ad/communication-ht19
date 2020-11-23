@@ -1,3 +1,14 @@
+/**
+ * @file main.cpp
+ * @author PraveenaSiva (pravisiva757@gmail.com)
+ * @brief Aplication for NTP and MQTT 
+ *        NTP -> To initialize RTC on Teensy , MQTT -> To publish Topics(signals from CAN bus ) 
+* @version 0.1
+ * @date 2020-11-23
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
 #include <bsp.h>
 #include <time.h>
 #include <common.h>
@@ -16,11 +27,6 @@
 
 WiFiClient wifi;
 MQTTClient client;
-
-#define CLIENT_ID "com-node"
-#define USERNAME "rdgxxhuu"
-#define PASSWORD "HtRsIozmfKrQ"
-#define SERVER "m24.cloudmqtt.com"
 
 void setup()
 {
