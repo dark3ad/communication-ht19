@@ -2,7 +2,6 @@
 #define BSP_H
 
 #define DEVELOPMENT
-
 #ifdef TARGET
 #include <Arduino.h>
 #ifdef DEVELOPMENT
