@@ -155,6 +155,18 @@ void loop()
             }
         }
     }
+    else
+    {
+        // indicate i2c error by blinking led
+        while (true)
+        {
+            // blink the led
+            led_driver_turn_on();
+            bsp_delay(500);
+            led_driver_turn_off();
+            bsp_delay(500);
+        }
+    }
 
     // should publish every 5  sec
     bsp_delay(5000);
