@@ -21,9 +21,10 @@
 // should include <wifi.h> in <wifi_driver.h> for mqtt
 #include <wifi.h>
 
-#define SSID "comhem_E7C457" //"YA-OPEN"
-#define PASS "40430DBB28"    //"utbildning2015"
+#define SSID "YA-OPEN"
+#define PASS "utbildning2015"
 #define DATE_TIME_LENGTH (19U)
+#define MAX_SIGNAL_SIZE (3U) // message size (2 byte + 1)
 
 WiFiClient wifi;
 MQTTClient client;
@@ -88,51 +89,70 @@ void loop()
 {
 
     client.loop();
+    uint8_t status;
 
     if (!client.connected())
     {
         if (!wifi_driver_status())
         {
+            status = WIFI_DISCONNECTED;
+
+            //send WIFI_DISCONNECTED message to teensy
+            i2c_driver_write(&status, sizeof(status));
             wifi_driver_connect();
         }
+
         while (!client.connect(CLIENT_ID, USERNAME, PASSWORD))
         {
+            status = MQTT_DISCONNECTED;
+
+            //send MQTT_DISCONNECTED message to teensy
+            i2c_driver_write(&status, sizeof(status));
+
             Serial.print(".");
             bsp_delay(1000);
         }
     }
 
-    // char buffer[PAYLOADS_LENGTH] = {};
+    char buffer[PAYLOADS_LENGTH] = {};
+
     // reading buffer from teensy via i2c
-    //i2c_driver_read((uint8_t *)buffer, sizeof(buffer));
-
-    char buffer[13] = "0|500|3|4|5|"; // just for testing purpose
-
-    //variable to store parsed text from buffer when it finds "|"
-    char message[3] = {};
-    uint8_t topic_index = 0, i = 0;
-
-    for (char *ptr = (char *)buffer; *ptr != 0; ptr++)
+    if (i2c_driver_read((uint8_t *)buffer, sizeof(buffer)))
     {
-        if (*ptr == '|')
-        {
-            message[i] = '\0';
-            i = 0;
+        //variable to store parsed text from buffer when it finds "|"
+        char message[MAX_SIGNAL_SIZE] = {};
+        uint8_t topic_index = 0, i = 0;
 
-            if (strlen(message))
+        for (char *ptr = (char *)buffer; *ptr != 0; ptr++)
+        {
+            if (*ptr == '|')
             {
-                if (topic_index < TOPICS_NUMBER)
+                message[i] = '\0';
+                i = 0;
+
+                if (strlen(message))
                 {
-                    //client.publish("/Topic", value);
-                    client.publish(topics[topic_index], message);
-                    topic_index++;
+                    if (topic_index < TOPICS_NUMBER)
+                    {
+                        //client.publish("/Topic", value);
+                        if (client.publish(topics[topic_index], message))
+                        {
+                            topic_index++;
+                        }
+                        else
+                        {
+                            status = MQTT_PUBLISH_ERROR;
+                            //send MQTT_PUBLISH_ERROR message to teensy
+                            i2c_driver_write(&status, sizeof(status));
+                        }
+                    }
                 }
             }
-        }
-        else
-        {
-            message[i] = *ptr;
-            i++;
+            else
+            {
+                message[i] = *ptr;
+                i++;
+            }
         }
     }
 
