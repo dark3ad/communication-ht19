@@ -109,7 +109,7 @@ static void water_level_menu_handler(void * args)
           read_bsp_string(input);
 
           opt = strtol(input, NULL, 10);
-          set_water_level_calibration_max(opt);
+          //set_water_level_calibration_max(opt);
       break;
     default:
       printf("Nope");
@@ -170,7 +170,7 @@ static void flow_meter_menu_handler(void * args)
         read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
-        set_flow_meter_calibration_max(opt);
+        //set_flow_meter_calibration_max(opt);
         break;
     default:
         break;
