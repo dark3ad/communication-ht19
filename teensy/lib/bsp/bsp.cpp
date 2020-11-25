@@ -17,6 +17,11 @@ void bsp_serial_write(const char *msg)
 
 char bsp_serial_read(void)
 {
+  if(bsp_serial_available() <= 0)
+  {
+    return 0;
+  }
+
   return (char)Serial.read();
 }
 

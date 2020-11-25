@@ -17,7 +17,7 @@ char bsp_serial_read(void);
 
 void bsp_serial_write(void);
 
-void bsp_serial_available(void);
+int bsp_serial_available(void);
 
 #else
 #include <stdio.h>

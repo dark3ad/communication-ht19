@@ -10,37 +10,10 @@
 #include <canbus.h>
 #include <common.h>
 #include <string.h>
-#include <bsp_io.h>
+#include <bsp.h>
 #include <sdcard.h>
 #include <unistd.h>
 #include <stdlib.h>
-
-#define READ_BUFFER_SIZE 64
-
-#define MAIN_MENU_SNAPSHOT 0
-#define MAIN_MENU_FILES 1
-#define MAIN_MENU_CALIBRATION 2
-
-#define CALIBRATION_MENU_TEMPERATURE 0
-#define CALIBRATION_MENU_HUMIDITY 1
-#define CALIBRATION_MENU_FLOW_METER 2
-#define CALIBRATION_MENU_WATER_LEVEL 3
-
-#define TEMP_MENU_SET_TARGET_MIN 0
-#define TEMP_MENU_SET_TARGET_MAX 1
-#define TEMP_MENU_SET_CALI_MIN 2
-#define TEMP_MENU_SET_CALI_MAX 3
-
-#define HUM_MENU_SET_TARGET_MIN 0
-#define HUM_MENU_SET_TARGET_MAX 1
-#define HUM_MENU_SET_CALI_MIN 2
-#define HUM_MENU_SET_CALI_MAX 3
-
-struct menu_t {
-  const char * label;
-  void (* presenter)(void *);
-  void (* handler)(void *);
-};
 
 static menu_t main_menu;
 static menu_t temperature_menu;
@@ -54,6 +27,18 @@ static menu_t calibration_menu;
 
 static menu_t * current_menu;
 static char input[READ_BUFFER_SIZE] = {0};
+
+static void read_bsp_string(char * input)
+{
+  uint8_t index = 0;
+  while(bsp_serial_available)
+  {
+    if(bsp_serial_available() > 0)
+    {
+      *(input + index) = bsp_serial_read();
+    }
+  }
+}
 
 static void calibration_menu_presenter(void * args)
 {
@@ -103,7 +88,33 @@ static void load_logged_files(void * args)
 
 static void water_level_menu_handler(void * args)
 {
-  
+  uint8_t opt = strtol((const char *)args, NULL, 10);
+
+  switch(opt){
+      case WATER_LEVEL_MENU_TARGET_MIN:
+          printf("Enter target min:");
+          read_bsp_string(input);
+
+          opt = strtol(input, NULL, 10);
+          set_water_level_target_min(opt);
+      break;
+    case WATER_LEVEL_MENU_TARGET_MAX:
+          printf("Enter target max:");
+          read_bsp_string(input);
+
+          opt = strtol(input, NULL, 10);
+          set_water_level_target_max(opt);
+    case WATER_LEVEL_MENU_CAL_MAX:
+          printf("Enter calibration max:");
+          read_bsp_string(input);
+
+          opt = strtol(input, NULL, 10);
+          set_water_level_calibration_max(opt);
+      break;
+    default:
+      printf("Nope");
+      break;
+  }
 }
 
 static void water_level_menu_presenter(void * args)
@@ -113,27 +124,76 @@ static void water_level_menu_presenter(void * args)
 
 static void moisture_menu_presenter(void * args)
 {
-
+    if(args == NULL)
+        return;
 }
 
 static void moisture_menu_handler(void * args)
 {
+  uint8_t opt = strtol((const char *)args, NULL, 10);
 
+  switch(opt){
+      case MOIS_MENU_SET_TARGET_MIN:
+          printf("Enter target min:");
+          read_bsp_string(input);
+
+          opt = strtol(input, NULL, 10);
+          set_soil_moisture_target_min(opt);
+      break;
+    case MOIS_MENU_SET_TARGET_MAX:
+          printf("Enter target max:");
+          read_bsp_string(input);
+
+          opt = strtol(input, NULL, 10);
+          set_soil_moisture_target_max(opt);
+      break;
+    default:
+      printf("Nope");
+      break;
+  }
 }
 
 static void flow_meter_menu_presenter(void * args)
 {
-
+  printf("%d) Set calibration max.\n", FLOW_MENU_SET_CALI_MAX);
 }
 
 static void flow_meter_menu_handler(void * args)
 {
+    uint16_t opt = strtol((const char *)args, NULL, 10);
+    char input[5];
 
+    switch(opt) 
+    {
+    case FLOW_MENU_SET_CALI_MAX:
+        printf("Enter calibration max:");
+        read_bsp_string(input);
+
+        opt = strtol(input, NULL, 10);
+        set_flow_meter_calibration_max(opt);
+        break;
+    default:
+        break;
+    }
 }
 
 static void light_menu_handler(void * args)
 {
+    uint16_t opt = strtol((const char *)args, NULL, 10);
+    char input[5];
 
+    switch(opt) 
+    {
+    case LIGHT_MENU_TARGET_MIN:
+        printf("Enter target min:");
+        read_bsp_string(input);
+
+        opt = strtol(input, NULL, 10);
+        set_light_intensity_target_min(opt);
+        break;
+    default:
+        break;
+    }
 }
 
 static void light_menu_presenter(void * args)
@@ -143,7 +203,42 @@ static void light_menu_presenter(void * args)
 
 static void humidity_menu_handler(void * args)
 {
+    uint8_t opt = strtol((const char *)args, NULL, 10);
+    char input[3];
 
+    switch(opt) 
+    {
+    case HUM_MENU_SET_TARGET_MIN:
+        printf("Enter target min:");
+        read_bsp_string(input);
+
+        opt = strtol(input, NULL, 10);
+        set_temperature_target_max(opt);
+        break;
+    case HUM_MENU_SET_TARGET_MAX:
+        printf("Enter target max:");
+        read_bsp_string(input);
+
+        opt = strtol(input, NULL, 10);
+        set_temperature_target_min(opt);
+        break;
+    case HUM_MENU_SET_CALI_MIN:
+        printf("Enter calibration min:");
+        read_bsp_string(input);
+
+        opt = strtol(input, NULL, 10);
+        set_humidity_calibration_min(opt);
+        break;
+    case HUM_MENU_SET_CALI_MAX:
+        printf("Enter calibration max:");
+        read_bsp_string(input);
+
+        opt = strtol(input, NULL, 10);
+        set_humidity_calibration_max(opt);
+        break;
+    default:
+        break;
+    }
 }
 
 static void humidity_menu_presenter(void * args)
@@ -166,28 +261,28 @@ static void temperature_menu_handler(void * args)
     {
     case TEMP_MENU_SET_TARGET_MAX:
         printf("Enter target max:");
-        bsp_serial_read(input);
+        read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
         set_temperature_target_max(opt);
         break;
     case TEMP_MENU_SET_TARGET_MIN:
         printf("Enter target min:");
-        bsp_serial_read(input);
+        read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
         set_temperature_target_min(opt);
         break;
     case TEMP_MENU_SET_CALI_MIN:
         printf("Enter calibration min:");
-        bsp_serial_read(input);
+        read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
         set_temperature_calibration_min(opt);
         break;
     case TEMP_MENU_SET_CALI_MAX:
         printf("Enter calibration max:");
-        bsp_serial_read(input);
+        read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
         set_temperature_calibration_max(opt);
@@ -267,11 +362,11 @@ static void main_menu_handler(void * args)
 
 int terminal_initialize(void)
 {
-
-  main_menu = {"main_menu", main_menu_presenter, main_menu_handler};
   logged_files_menu = {"logged_files", logged_files_menu_presenter, logged_files_menu_handler};
   calibration_menu = {"calibration", calibration_menu_presenter, calibration_menu_handler};
   temperature_menu = {"temperature_menu", temperature_menu_presenter, temperature_menu_handler};
+  humidity_menu = {"humidity_menu", humidity_menu_presenter, humidity_menu_handler};
+  flow_meter_menu = {"flow_meter_menu", flow_meter_menu_presenter, flow_meter_menu_handler};
   current_menu = &main_menu;
 
   // Check the SD card status.
@@ -296,7 +391,7 @@ int terminal_run(void)
 
     if(bsp_serial_available())
     {
-      bsp_serial_read(input);
+      read_bsp_string(input);
     }
 
     if(memcmp(input, "q", 1) == 0)
