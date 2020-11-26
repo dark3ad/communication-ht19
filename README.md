@@ -1,8 +1,8 @@
 # Greenhouse: Communication Node
 
-![Product Owner Status](https://img.shields.io/badge/Faroch%20Latest%20Review-Approved-success?style=for-the-badge&logo=farfetch)
+![Product Owner Status](https://img.shields.io/badge/Product%20Owner%20Review-Approved-success?style=for-the-badge&logo=farfetch)
 
-![Lines of code](https://img.shields.io/tokei/lines/github/farochmehri/communication-ht19) ![GitHub issues](https://img.shields.io/github/issues-raw/farochmehri/communication-ht19) ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/farochmehri/communication-ht19/latest) 
+![Lines of code](https://img.shields.io/tokei/lines/github/farochmehri/communication-ht19) ![GitHub issues](https://img.shields.io/github/issues-raw/farochmehri/communication-ht19)
 
 ## Requirements:
 
