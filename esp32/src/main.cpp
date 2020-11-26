@@ -3,12 +3,13 @@
  * @author PraveenaSiva (pravisiva757@gmail.com)
  * @brief Aplication for NTP and MQTT 
  *        NTP -> To initialize RTC on Teensy , MQTT -> To publish Topics(signals from CAN bus ) 
-* @version 0.1
+ * @version 0.1
  * @date 2020-11-23
  * 
  * @copyright Copyright (c) 2020
  * 
  */
+
 #include <bsp.h>
 #include <time.h>
 #include <common.h>
@@ -18,16 +19,13 @@
 #include <wifi_driver.h>
 #include <MQTTClient.h>
 
-// should include <wifi.h> in <wifi_driver.h> for mqtt
-#include <wifi.h>
-
 #define SSID "YA-OPEN"
 #define PASS "utbildning2015"
 #define DATE_TIME_LENGTH (19U)
-#define MAX_SIGNAL_SIZE (3U) // message size (2 byte + 1)
+#define MAX_SIGNAL_SIZE (32U)
 
-WiFiClient wifi;
-MQTTClient client;
+static WiFiClient wifi;
+static MQTTClient client;
 
 void setup()
 {
@@ -73,12 +71,16 @@ void setup()
             if (i2c_driver_write(datetime, DATE_TIME_LENGTH))
             {
                 status = OKAY;
+                led_driver_turn_off();
             }
         }
         else
         {
             // Send ntp error message to the teensy
-            i2c_driver_write(&status, sizeof(status));
+            if (!i2c_driver_write(&status, sizeof(status)))
+            {
+                led_driver_turn_on();
+            }
         }
 
         bsp_delay(1000);
@@ -87,41 +89,59 @@ void setup()
 
 void loop()
 {
-
     client.loop();
-    uint8_t status;
+    bsp_delay(10);
+
+    uint8_t status = OKAY;
+
+    if (!wifi_driver_status())
+    {
+        status = WIFI_DISCONNECTED;
+
+        //send WIFI_DISCONNECTED message to teensy
+        if (!i2c_driver_write(&status, sizeof(status)))
+        {
+            led_driver_turn_on();
+        }
+        else
+        {
+            led_driver_turn_off();
+        }
+
+        wifi_driver_connect();
+    }
 
     if (!client.connected())
     {
-        if (!wifi_driver_status())
-        {
-            status = WIFI_DISCONNECTED;
-
-            //send WIFI_DISCONNECTED message to teensy
-            i2c_driver_write(&status, sizeof(status));
-            wifi_driver_connect();
-        }
-
         while (!client.connect(CLIENT_ID, USERNAME, PASSWORD))
         {
             status = MQTT_DISCONNECTED;
 
             //send MQTT_DISCONNECTED message to teensy
-            i2c_driver_write(&status, sizeof(status));
+            if (!i2c_driver_write(&status, sizeof(status)))
+            {
+                led_driver_turn_on();
+            }
+            else
+            {
+                led_driver_turn_off();
+            }
 
-            Serial.print(".");
+            PRINTF("%s", ".");
             bsp_delay(1000);
         }
     }
 
     char buffer[PAYLOADS_LENGTH] = {};
 
-    // reading buffer from teensy via i2c
+    // Reading buffer from teensy via i2c
     if (i2c_driver_read((uint8_t *)buffer, sizeof(buffer)))
     {
+        led_driver_turn_off();
+
         //variable to store parsed text from buffer when it finds "|"
-        char message[MAX_SIGNAL_SIZE] = {};
         uint8_t topic_index = 0, i = 0;
+        char message[MAX_SIGNAL_SIZE] = {};
 
         for (char *ptr = (char *)buffer; *ptr != 0; ptr++)
         {
@@ -143,7 +163,15 @@ void loop()
                         {
                             status = MQTT_PUBLISH_ERROR;
                             //send MQTT_PUBLISH_ERROR message to teensy
-                            i2c_driver_write(&status, sizeof(status));
+                            if (!i2c_driver_write(&status, sizeof(status)))
+                            {
+                                led_driver_turn_on();
+                            }
+                            else
+                            {
+                                led_driver_turn_off();
+                            }
+                            bsp_delay(100);
                         }
                     }
                 }
@@ -157,15 +185,7 @@ void loop()
     }
     else
     {
-        // indicate i2c error by blinking led
-        while (true)
-        {
-            // blink the led
-            led_driver_turn_on();
-            bsp_delay(500);
-            led_driver_turn_off();
-            bsp_delay(500);
-        }
+        led_driver_turn_on();
     }
 
     // should publish every 5  sec
