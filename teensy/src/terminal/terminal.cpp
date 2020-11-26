@@ -15,6 +15,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+bool allow_display = true;
+bool allow_read = false;
+bool allow_handle = false;
+
+uint8_t input_index = 0;
+
 static menu_t main_menu;
 static menu_t temperature_menu;
 static menu_t humidity_menu;
@@ -30,17 +36,22 @@ static char input[READ_BUFFER_SIZE] = {0};
 
 static void read_bsp_string(char * input)
 {
-  uint8_t index = 0;
-  while(bsp_serial_available())
+  char value = 0;
+  if(bsp_serial_available() > 0)
   {
-    if(bsp_serial_available() > 0)
+    value = bsp_serial_read();
+
+    if(memcmp(value, "\n", 1) == 0)
     {
-      *(input + index) = bsp_serial_read();
-      index += 1;
-    }
-    else {
+      allow_read = false;
+      allow_handle = true;
+      input_index = 0;
       return;
     }
+
+    bsp_serial_write(value);
+    *(input + input_index) = value;
+    input_index += 1;
   }
 }
 
@@ -353,11 +364,11 @@ static void logged_files_menu_presenter(void * args)
 
 static void main_menu_presenter(void * args)
 {
-  bsp_serial_write(MAIN_MENU_SNAPSHOT);
+  bsp_serial_print(MAIN_MENU_SNAPSHOT);
   bsp_serial_write(") Get snapshop of the system.\n");
-  bsp_serial_write(MAIN_MENU_FILES);
+  bsp_serial_print(MAIN_MENU_FILES);
   bsp_serial_write(") Get list of logged files.\n");
-  bsp_serial_write(MAIN_MENU_CALIBRATION);
+  bsp_serial_print(MAIN_MENU_CALIBRATION);
   bsp_serial_write(") Calibrate the system.\n");
   bsp_serial_write("q) Quit.\n");
   bsp_serial_write("> ");
@@ -403,22 +414,42 @@ int terminal_initialize(void)
   return 0;
 }
 
+static void display()
+{
+  if(allow_display == true)
+  {
+    // Display the current menu.
+    bsp_serial_write("---- THE GREENHOUSE ---- v0.3\n");
+
+    current_menu->presenter(NULL);
+    allow_display = false;
+    allow_read = true;
+  }
+}
+
+static void read()
+{
+  if(allow_read == true)
+  {
+    read_bsp_string(input);
+  }
+}
+
+static void handle()
+{
+  if(allow_handle == true)
+  {
+    bsp_serial_print(input);
+    current_menu->handler(input);
+
+    allow_handle = false;
+    allow_display = true;
+  }
+}
+
 int terminal_run(void)
 {
-  // Display the current menu.
-  bsp_serial_write("---- THE GREENHOUSE ---- v0.3\n");
-
-  current_menu->presenter(NULL);
-
-  bsp_serial_print(bsp_serial_available());
-  bsp_serial_write("\n");
-  delay(500);
-  read_bsp_string(input);
-
-  if(memcmp(input, "q", 1) == 0)
-  {
-    return 0;
-  }
-
-  current_menu->handler(input);
+  display();
+  read();
+  handle();
 }
