@@ -10,6 +10,11 @@ void bsp_serial_begin(void)
     }
 }
 
+void bsp_serial_print(int value)
+{
+  Serial.print(value);
+}
+
 void bsp_serial_write(const char *msg)
 {
   Serial.write(msg);

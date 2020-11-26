@@ -31,23 +31,31 @@ static char input[READ_BUFFER_SIZE] = {0};
 static void read_bsp_string(char * input)
 {
   uint8_t index = 0;
-  while(bsp_serial_available)
+  while(bsp_serial_available())
   {
     if(bsp_serial_available() > 0)
     {
       *(input + index) = bsp_serial_read();
+      index += 1;
+    }
+    else {
+      return;
     }
   }
 }
 
 static void calibration_menu_presenter(void * args)
 {
-  printf("%d) Temperature.\n", CALIBRATION_MENU_TEMPERATURE);
-  printf("%d) Humidity.\n", CALIBRATION_MENU_HUMIDITY);
-  printf("%d) Flow Meter.\n", CALIBRATION_MENU_FLOW_METER);
-  printf("%d) Water Level.\n", CALIBRATION_MENU_WATER_LEVEL);
-  printf("b) Back to main menu.\n");
-  printf("q) Quit.\n");
+  bsp_serial_write(CALIBRATION_MENU_TEMPERATURE);
+  bsp_serial_write("%d) Temperature.\n");
+  bsp_serial_write(CALIBRATION_MENU_HUMIDITY);
+  bsp_serial_write("%d) Humidity.\n");
+  bsp_serial_write(CALIBRATION_MENU_FLOW_METER);
+  bsp_serial_write("%d) Flow Meter.\n");
+  bsp_serial_write(CALIBRATION_MENU_WATER_LEVEL);
+  bsp_serial_write("%d) Water Level.\n");
+  bsp_serial_write("b) Back to main menu.\n");
+  bsp_serial_write("q) Quit.\n");
 
 }
 
@@ -69,7 +77,7 @@ static void calibration_menu_handler(void * args)
             current_menu = &water_level_menu;
             break;
         default:
-            printf("Nope");
+            bsp_serial_write("Nope");
             break;
     }
 }
@@ -83,7 +91,7 @@ static void load_logged_files(void * args)
 {
   (void)args;
 
-  printf("The Logged Files");
+  bsp_serial_write("The Logged Files");
 }
 
 static void water_level_menu_handler(void * args)
@@ -92,27 +100,27 @@ static void water_level_menu_handler(void * args)
 
   switch(opt){
       case WATER_LEVEL_MENU_TARGET_MIN:
-          printf("Enter target min:");
+          bsp_serial_write("Enter target min:");
           read_bsp_string(input);
 
           opt = strtol(input, NULL, 10);
           set_water_level_target_min(opt);
       break;
     case WATER_LEVEL_MENU_TARGET_MAX:
-          printf("Enter target max:");
+          bsp_serial_write("Enter target max:");
           read_bsp_string(input);
 
           opt = strtol(input, NULL, 10);
           set_water_level_target_max(opt);
     case WATER_LEVEL_MENU_CAL_MAX:
-          printf("Enter calibration max:");
+          bsp_serial_write("Enter calibration max:");
           read_bsp_string(input);
 
           opt = strtol(input, NULL, 10);
           //set_water_level_calibration_max(opt);
       break;
     default:
-      printf("Nope");
+      bsp_serial_write("Nope");
       break;
   }
 }
@@ -134,28 +142,29 @@ static void moisture_menu_handler(void * args)
 
   switch(opt){
       case MOIS_MENU_SET_TARGET_MIN:
-          printf("Enter target min:");
+          bsp_serial_write("Enter target min:");
           read_bsp_string(input);
 
           opt = strtol(input, NULL, 10);
           set_soil_moisture_target_min(opt);
       break;
     case MOIS_MENU_SET_TARGET_MAX:
-          printf("Enter target max:");
+          bsp_serial_write("Enter target max:");
           read_bsp_string(input);
 
           opt = strtol(input, NULL, 10);
           set_soil_moisture_target_max(opt);
       break;
     default:
-      printf("Nope");
+      bsp_serial_write("Nope");
       break;
   }
 }
 
 static void flow_meter_menu_presenter(void * args)
 {
-  printf("%d) Set calibration max.\n", FLOW_MENU_SET_CALI_MAX);
+  bsp_serial_write(FLOW_MENU_SET_CALI_MAX);
+  bsp_serial_write("%d) Set calibration max.\n");
 }
 
 static void flow_meter_menu_handler(void * args)
@@ -166,7 +175,7 @@ static void flow_meter_menu_handler(void * args)
     switch(opt) 
     {
     case FLOW_MENU_SET_CALI_MAX:
-        printf("Enter calibration max:");
+        bsp_serial_write("Enter calibration max:");
         read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
@@ -185,7 +194,7 @@ static void light_menu_handler(void * args)
     switch(opt) 
     {
     case LIGHT_MENU_TARGET_MIN:
-        printf("Enter target min:");
+        bsp_serial_write("Enter target min:");
         read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
@@ -209,28 +218,28 @@ static void humidity_menu_handler(void * args)
     switch(opt) 
     {
     case HUM_MENU_SET_TARGET_MIN:
-        printf("Enter target min:");
+        bsp_serial_write("Enter target min:");
         read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
         set_temperature_target_max(opt);
         break;
     case HUM_MENU_SET_TARGET_MAX:
-        printf("Enter target max:");
+        bsp_serial_write("Enter target max:");
         read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
         set_temperature_target_min(opt);
         break;
     case HUM_MENU_SET_CALI_MIN:
-        printf("Enter calibration min:");
+        bsp_serial_write("Enter calibration min:");
         read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
         set_humidity_calibration_min(opt);
         break;
     case HUM_MENU_SET_CALI_MAX:
-        printf("Enter calibration max:");
+        bsp_serial_write("Enter calibration max:");
         read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
@@ -243,13 +252,17 @@ static void humidity_menu_handler(void * args)
 
 static void humidity_menu_presenter(void * args)
 {
-  printf("%d) Set target min.\n", HUM_MENU_SET_TARGET_MIN);
-  printf("%d) Set target max.\n", HUM_MENU_SET_TARGET_MAX);
-  printf("%d) Set calibration min.\n", HUM_MENU_SET_CALI_MIN);
-  printf("%d) Set calibration max.\n", HUM_MENU_SET_CALI_MAX);
-  printf("b) Return to calibration.\n");
-  printf("q) Quit.\n");
-  printf("> ");
+  bsp_serial_write(HUM_MENU_SET_TARGET_MIN);
+  bsp_serial_write("%d) Set target min.\n");
+  bsp_serial_write(HUM_MENU_SET_TARGET_MAX);
+  bsp_serial_write("%d) Set target max.\n");
+  bsp_serial_write(HUM_MENU_SET_CALI_MIN);
+  bsp_serial_write("%d) Set calibration min.\n");
+  bsp_serial_write(HUM_MENU_SET_CALI_MAX);
+  bsp_serial_write("%d) Set calibration max.\n");
+  bsp_serial_write("b) Return to calibration.\n");
+  bsp_serial_write("q) Quit.\n");
+  bsp_serial_write("> ");
 }
 
 static void temperature_menu_handler(void * args)
@@ -260,28 +273,28 @@ static void temperature_menu_handler(void * args)
     switch(opt) 
     {
     case TEMP_MENU_SET_TARGET_MAX:
-        printf("Enter target max:");
+        bsp_serial_write("Enter target max:");
         read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
         set_temperature_target_max(opt);
         break;
     case TEMP_MENU_SET_TARGET_MIN:
-        printf("Enter target min:");
+        bsp_serial_write("Enter target min:");
         read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
         set_temperature_target_min(opt);
         break;
     case TEMP_MENU_SET_CALI_MIN:
-        printf("Enter calibration min:");
+        bsp_serial_write("Enter calibration min:");
         read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
         set_temperature_calibration_min(opt);
         break;
     case TEMP_MENU_SET_CALI_MAX:
-        printf("Enter calibration max:");
+        bsp_serial_write("Enter calibration max:");
         read_bsp_string(input);
 
         opt = strtol(input, NULL, 10);
@@ -294,13 +307,17 @@ static void temperature_menu_handler(void * args)
 
 static void temperature_menu_presenter(void * args)
 {
-  printf("%d) Set target min.\n", TEMP_MENU_SET_TARGET_MIN);
-  printf("%d) Set target max.\n", TEMP_MENU_SET_TARGET_MAX);
-  printf("%d) Set calibration min.\n", TEMP_MENU_SET_CALI_MIN);
-  printf("%d) Set calibration max.\n", TEMP_MENU_SET_CALI_MAX);
-  printf("b) Return to calibration.\n");
-  printf("q) Quit.\n");
-  printf("> ");
+  bsp_serial_write(TEMP_MENU_SET_TARGET_MIN);
+  bsp_serial_write(") Set target min.\n");
+  bsp_serial_write(TEMP_MENU_SET_TARGET_MAX);
+  bsp_serial_write(") Set calibration min.\n");
+  bsp_serial_write(TEMP_MENU_SET_CALI_MIN);
+  bsp_serial_write(") Set calibration min.\n");
+  bsp_serial_write(TEMP_MENU_SET_CALI_MAX);
+  bsp_serial_write(") Set calibration max.\n");
+  bsp_serial_write("b) Return to calibration.\n");
+  bsp_serial_write("q) Quit.\n");
+  bsp_serial_write("> ");
 }
 
 static void logged_files_menu_handler(void * args)
@@ -313,11 +330,12 @@ static void logged_files_menu_handler(void * args)
     if(memcmp(list.logs[i], args, sizeof(char) * 2) == 0)
     {
       sdcard_read_file(list.logs[i], buffer, 13);
-      printf("%s\n", buffer);
+      bsp_serial_write(buffer);
+      bsp_serial_write("\n");
       return;
     }
   }
-  printf("Could not find file");
+  bsp_serial_write("Could not find file");
 }
 
 static void logged_files_menu_presenter(void * args)
@@ -325,20 +343,24 @@ static void logged_files_menu_presenter(void * args)
   filelist_t list = sdcard_get_files_list();
   for(uint8_t i = 0; i < 2; i++)
   {
-    printf("%s\n", list.logs[i]);
+    bsp_serial_write(list.logs[i]);
+    bsp_serial_write("\n");
   }
-  printf("b) Return to main menu.\n");
-  printf("q) Quit.\n");
-  printf("> ");
+  bsp_serial_write("b) Return to main menu.\n");
+  bsp_serial_write("q) Quit.\n");
+  bsp_serial_write("> ");
 }
 
 static void main_menu_presenter(void * args)
 {
-  printf("%d) Get snapshop of the system.\n", MAIN_MENU_SNAPSHOT);
-  printf("%d) Get list of logged files.\n", MAIN_MENU_FILES);
-  printf("%d) Calibrate the system.\n", MAIN_MENU_CALIBRATION);
-  printf("q) Quit.\n");
-  printf("> ");
+  bsp_serial_write(MAIN_MENU_SNAPSHOT);
+  bsp_serial_write(") Get snapshop of the system.\n");
+  bsp_serial_write(MAIN_MENU_FILES);
+  bsp_serial_write(") Get list of logged files.\n");
+  bsp_serial_write(MAIN_MENU_CALIBRATION);
+  bsp_serial_write(") Calibrate the system.\n");
+  bsp_serial_write("q) Quit.\n");
+  bsp_serial_write("> ");
 }
 
 static void main_menu_handler(void * args)
@@ -362,6 +384,7 @@ static void main_menu_handler(void * args)
 
 int terminal_initialize(void)
 {
+  main_menu = {"main_menu", main_menu_presenter, main_menu_handler};
   logged_files_menu = {"logged_files", logged_files_menu_presenter, logged_files_menu_handler};
   calibration_menu = {"calibration", calibration_menu_presenter, calibration_menu_handler};
   temperature_menu = {"temperature_menu", temperature_menu_presenter, temperature_menu_handler};
@@ -382,23 +405,20 @@ int terminal_initialize(void)
 
 int terminal_run(void)
 {
-  while(true)
+  // Display the current menu.
+  bsp_serial_write("---- THE GREENHOUSE ---- v0.3\n");
+
+  current_menu->presenter(NULL);
+
+  bsp_serial_print(bsp_serial_available());
+  bsp_serial_write("\n");
+  delay(500);
+  read_bsp_string(input);
+
+  if(memcmp(input, "q", 1) == 0)
   {
-    // Display the current menu.
-    printf("---- THE GREENHOUSE ----\n");
-
-    current_menu->presenter(NULL);
-
-    if(bsp_serial_available())
-    {
-      read_bsp_string(input);
-    }
-
-    if(memcmp(input, "q", 1) == 0)
-    {
-      return 0;
-    }
-    current_menu->handler(input);
+    return 0;
   }
-  return 0;
+
+  current_menu->handler(input);
 }
