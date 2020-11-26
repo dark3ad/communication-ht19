@@ -1,4 +1,3 @@
-#include <WiFi.h>
 #include <wifi_driver.h>
 
 void wifi_driver_init(const char *ssid, const char *password)
