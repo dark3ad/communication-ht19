@@ -1,5 +1,8 @@
 # Greenhouse: Communication Node
 
+![Create Release](https://github.com/farochmehri/communication-ht19/workflows/Create%20Release/badge.svg) ![GitHub](https://img.shields.io/github/license/farochmehri/communication-ht19) ![made-for-VSCode](https://img.shields.io/badge/Made%20for-VSCode-1f425f.svg)
+![GitHub release](https://img.shields.io/github/v/release/farochmehri/communication-ht19) ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/farochmehri/communication-ht19/latest) ![Lines of code](https://img.shields.io/tokei/lines/github/farochmehri/communication-ht19) ![GitHub issues](https://img.shields.io/github/issues-raw/farochmehri/communication-ht19)
+
 ## Requirements:
 
 These requirements are defined according to these criteras:
