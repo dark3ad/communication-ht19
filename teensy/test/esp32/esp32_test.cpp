@@ -10,7 +10,6 @@
 #include <i2c_driver.h>
 #include <esp32.h>
 
-#include <stdio.h>
 #include <string.h>
 
 #define DATETIME_LENGTH (19U)
@@ -33,8 +32,10 @@ static uint8_t hour;
 static uint8_t minute;
 static uint8_t second;
 
-static uint16_t rx_buffer[20] = {};
-static uint8_t payload_buffer[50] = {}; // just try
+// Assume that data received from esp32 via i2c
+static uint16_t rx_buffer[DATETIME_LENGTH + 1] = {};
+
+//-------------------------------------- static functions ---------------------------------//
 
 static void reset_variables()
 {
@@ -105,19 +106,15 @@ static void handle_receive(size_t length)
 }
 static void handle_request(void)
 {
-    /*char buffer[PAYLOADS_LENGTH] = {};
-    get_payloads(buffer);
-
-    uint8_t status = i2c_driver_write((uint8_t *)buffer, strlen(buffer));
-    set_esp32_status((status == OKAY) ? OKAY : I2C_ERROR);*/
 }
-static void time_handling(char *time)
+static void rx_buffer_handling(char *data)
 {
-    int size = strlen(time);
-    memcpy(rx_buffer, time, size);
+    int size = strlen(data);
+    memcpy(rx_buffer, data, size);
     handle_receive(size);
 }
-//----------------------------------- Fake functions -----------------------------------------------//
+
+//------------------------------------------ Fake functions -----------------------------------------------//
 
 uint16_t bsp_year(void)
 {
@@ -221,10 +218,8 @@ uint8_t i2c_driver_write(uint8_t *data, size_t size)
 }
 
 //clear &&rm - rf build &&mkdir - p build
-//---------------------------------------------------------------------------------------------//
 
 // Running before every "RUN_TEST(...)"
-
 void setUp()
 {
     reset_variables();
@@ -235,6 +230,7 @@ void tearDown()
 {
 }
 
+// checking esp32 status after it initialized
 void test_esp32_init(void)
 {
 
@@ -257,32 +253,50 @@ void test_rtc_status(void)
 
     // if  time is not null but time length is not equal to 20
     sprintf(time, "%d-%d-%d", 2020, 11, 25);
-    time_handling(time);
+    rx_buffer_handling(time);
 
     TEST_ASSERT_EQUAL_UINT8(UNINITIALIZED, rtc_status);
     TEST_ASSERT_EQUAL_UINT8(I2C_ERROR, esp32_status);
 
     // if time length is  equal to 19 but time formate is not correct
     sprintf(time, "%d-%d-%d-%d-%d-%d", 2020, 11, 25, 11, 20, 30);
-    time_handling(time);
+    rx_buffer_handling(time);
     TEST_ASSERT_EQUAL_UINT8(UNINITIALIZED, rtc_status);
     TEST_ASSERT_EQUAL_UINT8(I2C_ERROR, esp32_status);
 
     // if time length is  equal to 19 and  time formate is also correct
     sprintf(time, "%d-%d-%d %d:%d:%d", 2020, 11, 25, 11, 20, 30);
-    time_handling(time);
+    rx_buffer_handling(time);
     TEST_ASSERT_EQUAL_UINT8(OKAY, rtc_status);
     TEST_ASSERT_EQUAL_UINT8(OKAY, esp32_status);
 }
+
 // rx_buffer is status(WIFI_DISCONNECCTED, MQTT_DISCONNECCTED,MQTT_PUBLISH _ERROR,NTP_ERROR) from esp32 via i2c
 void test_esp32_status(void)
 {
     esp32_init();
     TEST_ASSERT_EQUAL_UINT8(OKAY, esp32_status);
 
-    char error_status = {};
+    // if status is wifi disconnected
+    char error_status[2] = {};
+    sprintf(error_status, "%c", WIFI_DISCONNECTED);
+    rx_buffer_handling(error_status);
+    TEST_ASSERT_EQUAL_UINT8(WIFI_DISCONNECTED, esp32_status);
+
+    // if status is mqtt disconnected
+
+    sprintf(error_status, "%c", MQTT_DISCONNECTED);
+    rx_buffer_handling(error_status);
+    TEST_ASSERT_EQUAL_UINT8(MQTT_DISCONNECTED, esp32_status);
+
+    // if status is mqtt publish error
+
+    sprintf(error_status, "%c", MQTT_PUBLISH_ERROR);
+    rx_buffer_handling(error_status);
+    TEST_ASSERT_EQUAL_UINT8(MQTT_PUBLISH_ERROR, esp32_status);
 }
 
+// checking rtc_status whether it is initialized or not  after esp32 run
 void test_ep32_run(void)
 {
     char time[20] = {};
@@ -295,7 +309,7 @@ void test_ep32_run(void)
 
     //if rtc_status is  okay,then  all rtc values set and we can expect the same
     sprintf(time, "%d-%d-%d %d:%d:%d", 2020, 11, 25, 11, 20, 30);
-    time_handling(time);
+    rx_buffer_handling(time);
     TEST_ASSERT_EQUAL_UINT8(OKAY, rtc_status);
     esp32_run();
     TEST_ASSERT_EQUAL_UINT8(2020, rtc_year);
@@ -323,6 +337,7 @@ int main()
 
     RUN_TEST(test_esp32_init);
     RUN_TEST(test_rtc_status);
+    RUN_TEST(test_esp32_status);
     RUN_TEST(test_ep32_run);
 
 #ifdef TARGET
