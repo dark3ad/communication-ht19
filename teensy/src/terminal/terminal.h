@@ -40,12 +40,6 @@
 
 #define LIGHT_MENU_TARGET_MIN 0
 
-struct menu_t {
-  const char * label;
-  void (* presenter)(void *);
-  void (* handler)(void *);
-};
-
 int terminal_initialize(void);
 int terminal_run(void);
 
