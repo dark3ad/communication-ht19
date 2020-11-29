@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <terminal.h>
 #include <canbus.h>
+#include <candata.h>
 #include <common.h>
 #include <string.h>
 #include <bsp.h>
@@ -28,9 +29,9 @@ struct breadcrumbs_t {
 };
 
 struct canbus_data_t {
-  uint8_t (* setter_uint8)(uint8_t value);
-  uint8_t (* setter_uint16)(uint16_t value);
-  char * message;
+  bool (* setter_uint8)(uint8_t value);
+  bool (* setter_uint16)(uint16_t value);
+  const char * message;
 };
 
 static breadcrumbs_t breadcrumbs;
@@ -40,8 +41,49 @@ static char input[READ_BUFFER_SIZE] = {0};
 
 static void temperature_menu_presenter(void * args);
 static void temperature_menu_handler(void * args);
+
+static void humidity_menu_presenter(void * args);
+static void humidity_menu_handler(void * args);
+
+static void light_menu_presenter(void * args);
+static void light_menu_handler(void * args);
+
+static void moisture_menu_presenter(void * args);
+static void moisture_menu_handler(void * args);
+
+static void water_level_menu_presenter(void * args);
+static void water_level_menu_handler(void * args);
+
 static void breadcrumbs_enter(void (* h)(void *), void (* p)(void *));
 static void breadcrumbs_leave();
+
+static void update_canbus_uint8(void * args);
+static void update_canbus_uint16(void * args);
+
+static void target_bool_presenter(void * args)
+{
+  bsp_serial_write("Enter 0/1: ");
+}
+
+static void target_max_presenter(void * args)
+{
+  bsp_serial_write("Enter target max: ");
+}
+
+static void target_min_presenter(void * args)
+{
+  bsp_serial_write("Enter target min: ");
+}
+
+static void calibration_min_presenter(void * args)
+{
+  bsp_serial_write("Enter calibration min: ");
+}
+
+static void calibration_max_presenter(void * args)
+{
+  bsp_serial_write("Enter calibration max: ");
+}
 
 static void calibration_menu_presenter(void * args)
 {
@@ -49,8 +91,8 @@ static void calibration_menu_presenter(void * args)
   bsp_serial_write(") Temperature.\n");
   bsp_serial_print(CALIBRATION_MENU_HUMIDITY);
   bsp_serial_write(") Humidity.\n");
-  bsp_serial_print(CALIBRATION_MENU_FLOW_METER);
-  bsp_serial_write(") Flow Meter.\n");
+  bsp_serial_print(CALIBRATION_MENU_LIGHT_INTENSITY);
+  bsp_serial_write(") Light Intensity.\n");
   bsp_serial_print(CALIBRATION_MENU_WATER_LEVEL);
   bsp_serial_write(") Water Level.\n");
   bsp_serial_write("b) Back to main menu.\n");
@@ -68,27 +110,223 @@ static void calibration_menu_handler(void * args)
     case CALIBRATION_MENU_HUMIDITY:
       breadcrumbs_enter(humidity_menu_handler, humidity_menu_presenter);
       break;
-    case CALIBRATION_MENU_FLOW_METER:
+    case CALIBRATION_MENU_SOIL_MOISTURE:
+      breadcrumbs_enter(moisture_menu_handler, moisture_menu_presenter);
       break;
     case CALIBRATION_MENU_WATER_LEVEL:
       breadcrumbs_enter(water_level_menu_handler, water_level_menu_presenter);
       break;
+    case CALIBRATION_MENU_LIGHT_INTENSITY:
+      breadcrumbs_enter(light_menu_handler, light_menu_presenter);
+      break;
     default:
-      bsp_serial_write("Nope");
       break;
   }
 }
 
-static void get_snapshot(void * args)
+static void get_snapshot(void)
 {
+  data_t data = get_candata();
+  bsp_serial_write("\nheater_status: ");
+  bsp_serial_print(data.actuator.heater.status);
 
-}
+  bsp_serial_write("\nheater_warmness_overwritten: ");
+  bsp_serial_print(data.actuator.heater.warmness.overwritten);
 
-static void load_logged_files(void * args)
-{
-  (void)args;
+  bsp_serial_write("\nheater_warmness: ");
+  bsp_serial_print(data.actuator.heater.warmness.value);
 
-  bsp_serial_write("The Logged Files");
+  bsp_serial_write("\nwater_valve_status: ");
+  bsp_serial_print(data.actuator.water_valve.status);
+
+  bsp_serial_write("\nwater_valve_state_overwritten: ");
+  bsp_serial_print(data.actuator.water_valve.state.overwritten);
+
+  bsp_serial_write("\nwater_valve_state: ");
+  bsp_serial_print(data.actuator.water_valve.state.value);
+
+  bsp_serial_write("\nfans_status: ");
+  bsp_serial_print(data.actuator.fans.status);
+
+  bsp_serial_write("\nfans_state_overwritten: ");
+  bsp_serial_print(data.actuator.fans.state.overwritten);
+
+  bsp_serial_write("\nfans_state: ");
+  bsp_serial_print(data.actuator.fans.state.value);
+
+  bsp_serial_write("\nwindow_status: ");
+  bsp_serial_print(data.actuator.window.status);
+
+  bsp_serial_write("\nwindow_state_overwritten: ");
+  bsp_serial_print(data.actuator.window.state.overwritten);
+
+  bsp_serial_write("\nwindow_state: ");
+  bsp_serial_print(data.actuator.window.state.value);
+
+  bsp_serial_write("\nlamp_status: ");
+  bsp_serial_print(data.actuator.lamp.status);
+
+  bsp_serial_write("\nlamp_shininess_overwritten: ");
+  bsp_serial_print(data.actuator.lamp.shininess.overwritten);
+
+  bsp_serial_write("\nlamp_shininess: ");
+  bsp_serial_print(data.actuator.lamp.shininess.value);
+
+  bsp_serial_write("\nwater_pump_status: ");
+  bsp_serial_print(data.actuator.water_pump.status);
+
+  bsp_serial_write("\nwater_pump_state_overwritten: ");
+  bsp_serial_print(data.actuator.water_pump.state.overwritten);
+
+  bsp_serial_write("\nwater_pump_state: ");
+  bsp_serial_print(data.actuator.water_pump.state.value);
+
+  bsp_serial_write("\nterminal_status: ");
+  bsp_serial_print(data.communication.terminal.status);
+
+  bsp_serial_write("\nesp32_status: ");
+  bsp_serial_print(data.communication.esp32.status);
+
+  bsp_serial_write("\nrtc_status: ");
+  bsp_serial_print(data.communication.rtc.status);
+
+  bsp_serial_write("\nsdcard_status: ");
+  bsp_serial_print(data.communication.sdcard.status);
+
+  bsp_serial_write("\nsdcard_free_space: ");
+  bsp_serial_print(data.communication.sdcard.free_space);
+
+  bsp_serial_write("\nlight_intensity_sensor_status: ");
+  bsp_serial_print(data.sensor.light.status);
+
+  bsp_serial_write("\nlight_intensity: ");
+  bsp_serial_print(data.sensor.light.intensity);
+
+  bsp_serial_write("\nlight_intensity_target_min: ");
+  bsp_serial_print(data.sensor.light.target.valid);
+
+  bsp_serial_write("\nlight_intensity_target_min: ");
+  bsp_serial_print(data.sensor.light.target.value);
+
+  bsp_serial_write("\nflow_meter_sensor_status: ");
+  bsp_serial_print(data.sensor.flow_meter.status);
+
+  bsp_serial_write("\nflow_rate: ");
+  bsp_serial_print(data.sensor.flow_meter.value);
+
+  bsp_serial_write("\ndht_sensor_status: ");
+  bsp_serial_print(data.sensor.humidity.status);
+
+  bsp_serial_write("\nhumidity_target_max: ");
+  bsp_serial_print(data.sensor.humidity.target.max.valid);
+
+  bsp_serial_write("\nhumidity_target_max: ");
+  bsp_serial_print(data.sensor.humidity.target.max.value);
+
+  bsp_serial_write("\nhumidity_target_min: ");
+  bsp_serial_print(data.sensor.humidity.target.min.valid);
+
+  bsp_serial_write("\nhumidity_target_min: ");
+  bsp_serial_print(data.sensor.humidity.target.min.value);
+
+  bsp_serial_write("\nhumidity: ");
+  bsp_serial_print(data.sensor.humidity.value);
+
+  bsp_serial_write("\nhumidity_calibration_max: ");
+  bsp_serial_print(data.sensor.humidity.calibration.max.valid);
+
+  bsp_serial_write("\nhumidity_calibration_max: ");
+  bsp_serial_print(data.sensor.humidity.calibration.max.value);
+
+  bsp_serial_write("\nhumidity_calibration_min: ");
+  bsp_serial_print(data.sensor.humidity.calibration.min.valid);
+
+  bsp_serial_write("\nhumidity_calibration_min: ");
+  bsp_serial_print(data.sensor.humidity.calibration.min.value);
+
+  bsp_serial_write("\nsoil_moisture_sensor_status: ");
+  bsp_serial_print(data.sensor.moisture.status);
+
+  bsp_serial_write("\nsoil_moisture_target_max: ");
+  bsp_serial_print(data.sensor.moisture.target.max.valid);
+
+  bsp_serial_write("\nsoil_moisture_target_max: ");
+  bsp_serial_print(data.sensor.moisture.target.max.value);
+
+  bsp_serial_write("\nsoil_moisture_target_min: ");
+  bsp_serial_print(data.sensor.moisture.target.min.valid);
+
+  bsp_serial_write("\nsoil_moisture_target_min: ");
+  bsp_serial_print(data.sensor.moisture.target.min.value);
+
+  bsp_serial_write("\nsoil_moisture: ");
+  bsp_serial_print(data.sensor.moisture.value);
+
+  bsp_serial_write("\nwater_level_sensor_status: ");
+  bsp_serial_print(data.sensor.water_level.status);
+
+  bsp_serial_write("\nwater_level_target_max: ");
+  bsp_serial_print(data.sensor.water_level.target.max.valid);
+
+  bsp_serial_write("\nwater_level_target_max: ");
+  bsp_serial_print(data.sensor.water_level.target.max.value);
+
+  bsp_serial_write("\nwater_level_target_min: ");
+  bsp_serial_print(data.sensor.water_level.target.min.valid);
+
+  bsp_serial_write("\nwater_level_target_min: ");
+  bsp_serial_print(data.sensor.water_level.target.min.value);
+
+  bsp_serial_write("\nwater_level: ");
+  bsp_serial_print(data.sensor.water_level.value);
+
+  bsp_serial_write("\ndht_sensor_status: ");
+  bsp_serial_print(data.sensor.temperature.status);
+
+  bsp_serial_write("\ntemperature_target_max: ");
+  bsp_serial_print(data.sensor.temperature.target.max.valid);
+
+  bsp_serial_write("\ntemperature_target_max: ");
+  bsp_serial_print(data.sensor.temperature.target.max.value);
+
+  bsp_serial_write("\ntemperature_target_min: ");
+  bsp_serial_print(data.sensor.temperature.target.min.valid);
+
+  bsp_serial_write("\ntemperature_target_min: ");
+  bsp_serial_print(data.sensor.temperature.target.min.value);
+
+  bsp_serial_write("\ntemperature: ");
+  bsp_serial_print(data.sensor.temperature.value);
+
+  bsp_serial_write("\ntemperature_calibration_max: ");
+  bsp_serial_print(data.sensor.temperature.calibration.max.valid);
+
+  bsp_serial_write("\ntemperature_calibration_max: ");
+  bsp_serial_print(data.sensor.temperature.calibration.max.value);
+
+  bsp_serial_write("\ntemperature_calibration_min: ");
+  bsp_serial_print(data.sensor.temperature.calibration.min.valid);
+
+  bsp_serial_write("\ntemperature_calibration_min: ");
+  bsp_serial_print(data.sensor.temperature.calibration.min.value);
+
+  bsp_serial_write("\nbuzzer_status: ");
+  bsp_serial_print(data.hmi.buzzer.status);
+
+  bsp_serial_write("\nkeypad_status: ");
+  bsp_serial_print(data.hmi.keypad.status);
+
+  bsp_serial_write("\nsystem_status: ");
+  bsp_serial_print(data.hmi.system.status);
+
+  bsp_serial_write("\nrgb_status: ");
+  bsp_serial_print(data.hmi.rgb.status);
+
+  bsp_serial_write("\ndisplay_status: ");
+  bsp_serial_print(data.hmi.display.status);
+
+  bsp_serial_write("\neeprom_status: ");
+  bsp_serial_print(data.hmi.eeprom.status);
 }
 
 static void water_level_menu_handler(void * args)
@@ -117,13 +355,26 @@ static void water_level_menu_handler(void * args)
 
 static void water_level_menu_presenter(void * args)
 {
-  
+  bsp_serial_print(WATER_LEVEL_MENU_TARGET_MIN);
+  bsp_serial_write(") Update water level target min.\n");
+  bsp_serial_print(WATER_LEVEL_MENU_TARGET_MAX);
+  bsp_serial_write(") Update water level target max.\n");
+  bsp_serial_print(WATER_LEVEL_MENU_VOLUME_MAX);
+  bsp_serial_write(") Update water volume target max.\n");
+  bsp_serial_write("b) Back to calibration.\n");
+  bsp_serial_write("q) Quit.\n");
+  bsp_serial_write("> ");
 }
 
 static void moisture_menu_presenter(void * args)
 {
-    if(args == NULL)
-        return;
+  bsp_serial_print(MOIS_MENU_SET_TARGET_MIN);
+  bsp_serial_write(") Update soil moisture sensor target min.\n");
+  bsp_serial_print(MOIS_MENU_SET_TARGET_MAX);
+  bsp_serial_write(") Update soil moisture sensor target max.\n");
+  bsp_serial_write("b) Back to calibration.\n");
+  bsp_serial_write("q) Quit.\n");
+  bsp_serial_write("> ");
 }
 
 static void moisture_menu_handler(void * args)
@@ -163,7 +414,11 @@ static void light_menu_handler(void * args)
 
 static void light_menu_presenter(void * args)
 {
-
+  bsp_serial_print(LIGHT_MENU_TARGET_MIN);
+  bsp_serial_write(") Update light intensity target min.\n");
+  bsp_serial_write("b) Back to calibration.\n");
+  bsp_serial_write("q) Quit.\n");
+  bsp_serial_write("> ");
 }
 
 static void humidity_menu_handler(void * args)
@@ -196,35 +451,15 @@ static void humidity_menu_handler(void * args)
     }
 }
 
-static void target_max_presenter(void * args)
-{
-  bsp_serial_write("Enter target max: ");
-}
-
-static void target_min_presenter(void * args)
-{
-  bsp_serial_write("Enter target min: ");
-}
-
-static void calibration_min_presenter(void * args)
-{
-  bsp_serial_write("Enter calibration min: ");
-}
-
-static void calibration_max_presenter(void * args)
-{
-  bsp_serial_write("Enter calibration max: ");
-}
-
 static void humidity_menu_presenter(void * args)
 {
-  bsp_serial_write(HUM_MENU_SET_TARGET_MIN);
+  bsp_serial_print(HUM_MENU_SET_TARGET_MIN);
   bsp_serial_write(") Set target min.\n");
-  bsp_serial_write(HUM_MENU_SET_TARGET_MAX);
+  bsp_serial_print(HUM_MENU_SET_TARGET_MAX);
   bsp_serial_write(") Set target max.\n");
-  bsp_serial_write(HUM_MENU_SET_CALI_MIN);
+  bsp_serial_print(HUM_MENU_SET_CALI_MIN);
   bsp_serial_write(") Set calibration min.\n");
-  bsp_serial_write(HUM_MENU_SET_CALI_MAX);
+  bsp_serial_print(HUM_MENU_SET_CALI_MAX);
   bsp_serial_write(") Set calibration max.\n");
   bsp_serial_write("b) Return to calibration.\n");
   bsp_serial_write("q) Quit.\n");
@@ -293,6 +528,7 @@ static void temperature_menu_handler(void * args)
 	break;
       default:
 	return;
+    }
 }
 
 static void temperature_menu_presenter(void * args)
@@ -312,7 +548,6 @@ static void temperature_menu_presenter(void * args)
 
 static void logged_files_menu_handler(void * args)
 {
-  char * name = (char *)args;
   filelist_t list = sdcard_get_files_list();
   char buffer[255] = {};
   for(uint8_t i = 0; i < 2; i++)
@@ -343,13 +578,69 @@ static void logged_files_menu_presenter(void * args)
 
 static void main_menu_presenter(void * args)
 {
-  bsp_serial_write("---- THE GREENHOUSE ---- v0.3\n");
+  bsp_serial_write("---- THE GREENHOUSE ----\n");
   bsp_serial_print(MAIN_MENU_SNAPSHOT);
   bsp_serial_write(") Get snapshop of the system.\n");
   bsp_serial_print(MAIN_MENU_FILES);
   bsp_serial_write(") Get list of logged files.\n");
   bsp_serial_print(MAIN_MENU_CALIBRATION);
   bsp_serial_write(") Calibrate the system.\n");
+  bsp_serial_print(MAIN_MENU_ACTUATORS);
+  bsp_serial_write(") Set actuators.\n");
+  bsp_serial_write("q) Quit.\n");
+  bsp_serial_write("> ");
+}
+
+static void actuators_menu_handler(void * args)
+{
+
+  uint8_t opt = strtol((const char *)args, NULL, 10);
+
+  switch(opt) 
+  {
+    case ACT_MENU_LAMP_SHININESS:
+      canbus_data.setter_uint8 = set_lamp_shininess;
+      canbus_data.message = "Updated lamp shininess: ";
+      break;
+    case ACT_MENU_HEAT_WARMNESS:
+      canbus_data.setter_uint8 = set_heater_warmness;
+      canbus_data.message = "Updated heater warmness: ";
+      break;
+    case ACT_MENU_PUMP_STATE:
+      canbus_data.setter_uint8 = set_water_pump_state;
+      canbus_data.message = "Updated water pump state: ";
+      break;
+    case ACT_MENU_VALVE_STATE:
+      canbus_data.setter_uint8 = set_water_valve_state;
+      canbus_data.message = "Updated water vale state: ";
+      break;
+    case ACT_MENU_WINDOW_STATE:
+      canbus_data.setter_uint8 = set_window_state;
+      canbus_data.message = "Updated window state: ";
+    case ACT_MENU_FAN_STATE:
+      canbus_data.setter_uint8 = set_fans_state;
+      canbus_data.message = "Updated fan state: ";
+    default:
+      return;
+  }
+  breadcrumbs_enter(update_canbus_uint8, target_bool_presenter);
+}
+
+static void actuators_menu_presenter(void * args)
+{
+  bsp_serial_print(ACT_MENU_LAMP_SHININESS);
+  bsp_serial_write(") Set lamp shininess.\n");
+  bsp_serial_print(ACT_MENU_HEAT_WARMNESS);
+  bsp_serial_write(") Set heater warmness.\n");
+  bsp_serial_print(ACT_MENU_PUMP_STATE);
+  bsp_serial_write(") Set water pump state.\n");
+  bsp_serial_print(ACT_MENU_VALVE_STATE);
+  bsp_serial_write(") Set valve state.\n");
+  bsp_serial_print(ACT_MENU_WINDOW_STATE);
+  bsp_serial_write(") Set window state.\n");
+  bsp_serial_print(ACT_MENU_FAN_STATE);
+  bsp_serial_write(") Set fan state.\n");
+  bsp_serial_write("b) Back to main menu.\n");
   bsp_serial_write("q) Quit.\n");
   bsp_serial_write("> ");
 }
@@ -360,12 +651,16 @@ static void main_menu_handler(void * args)
 
   switch(opt) {
     case MAIN_MENU_SNAPSHOT:
+      get_snapshot();
       break;
     case MAIN_MENU_FILES:
-      breadcrumbs_enter(&logged_files_menu_handler, &logged_files_menu_presenter);
+      breadcrumbs_enter(logged_files_menu_handler, logged_files_menu_presenter);
       break;
     case MAIN_MENU_CALIBRATION:
-      breadcrumbs_enter(&calibration_menu_handler, &calibration_menu_presenter);
+      breadcrumbs_enter(calibration_menu_handler, calibration_menu_presenter);
+      break;
+    case MAIN_MENU_ACTUATORS:
+      breadcrumbs_enter(actuators_menu_handler, actuators_menu_presenter);
       break;
     default:
       break;
@@ -442,7 +737,7 @@ static void handle()
 {
   if(allow_handle == true)
   {
-    if(input[0] == 'r')
+    if(input[0] == 'b')
     {
       breadcrumbs_leave();
       allow_handle = false;
@@ -465,7 +760,7 @@ static void handle()
   }
 }
 
-int terminal_run(void)
+void terminal_run(void)
 {
   display();
   read();
