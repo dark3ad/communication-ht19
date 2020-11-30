@@ -50,12 +50,12 @@ bool allow_display = true;
 bool allow_read = false;
 bool allow_handle = false;
 
-const char * allowed_chars = NULL;
+char allowed_chars[] = "b0123456789-\n\0";
 
 uint8_t input_index = 0;
 
 struct breadcrumbs_t {
-    void (*presenters[5])(void *);
+    void (*presenters[5])(void);
     void (*handlers[5])(void *);
     uint8_t level;
 };
@@ -86,16 +86,10 @@ static void moisture_menu_handler(void * args);
 static void water_level_menu_presenter(void);
 static void water_level_menu_handler(void * args);
 
-static void breadcrumbs_enter(void (* h)(void *), void (* p)(void *));
+static void breadcrumbs_enter(void (* h)(void *), void (* p)(void));
 static void breadcrumbs_leave();
 
 static void update_canbus_uint8(void * args);
-static void update_canbus_uint16(void * args);
-
-static void target_bool_presenter(void)
-{
-    bsp_serial_write("Enter 0/1: ");
-}
 
 static void target_max_presenter(void)
 {
@@ -158,16 +152,16 @@ static void calibration_menu_handler(void * args)
 static void get_snapshot(void)
 {
     data_t data = get_candata();
-    char buffer[1024] = {};
+    char buffer[4096] = {};
 
-    sprintf(buffer + strlen(buffer), "\n\n[%d] ================================\n", data.communication.rtc.datetime);
+    sprintf(buffer + strlen(buffer), "\n\n[%s] ================================\n", data.communication.rtc.datetime);
 
     get_terminal_text(buffer + strlen(buffer), data.communication.terminal);
-    get_esp32_text(buffer + strlen(buffer), data.communication.esp32));
-    get_sdcard_text(buffer + strlen(buffer), data.communication.sdcard));
-    get_rtc_text(buffer + strlen(buffer), data.communication.rtc));
+    get_esp32_text(buffer + strlen(buffer), data.communication.esp32);
+    get_sdcard_text(buffer + strlen(buffer), data.communication.sdcard);
+    get_rtc_text(buffer + strlen(buffer), data.communication.rtc);
 
-    sprintf(buffer + strlen(buffer), "\n============\n");
+    sprintf(buffer + strlen(buffer), "\n================================\n");
 
     get_heater_text(buffer + strlen(buffer), data.actuator.heater);
     get_water_valve_text(buffer + strlen(buffer), data.actuator.water_valve);
@@ -176,7 +170,7 @@ static void get_snapshot(void)
     get_lamp_text(buffer + strlen(buffer), data.actuator.lamp);
     get_water_pump_text(buffer + strlen(buffer), data.actuator.water_pump);
 
-    sprintf(buffer + strlen(buffer), "\n============\n");
+    sprintf(buffer + strlen(buffer), "\n================================\n");
 
     get_light_text(buffer + strlen(buffer), data.sensor.light);
     get_flow_meter_text(buffer + strlen(buffer), data.sensor.flow_meter);
@@ -185,7 +179,7 @@ static void get_snapshot(void)
     get_water_level_text(buffer + strlen(buffer), data.sensor.water_level);
     get_temperature_text(buffer + strlen(buffer), data.sensor.temperature);
 
-    sprintf(buffer + strlen(buffer), "\n============\n");
+    sprintf(buffer + strlen(buffer), "\n================================\n");
 
     get_buzzer_text(buffer + strlen(buffer), data.hmi.buzzer);
     get_keypad_text(buffer + strlen(buffer), data.hmi.keypad);
@@ -195,6 +189,8 @@ static void get_snapshot(void)
     get_eeprom_text(buffer + strlen(buffer), data.hmi.eeprom);
 
     sprintf(buffer + strlen(buffer), "\n================================\n");
+
+    bsp_serial_write(buffer);
 }
 
 static void water_level_menu_handler(void * args)
@@ -321,23 +317,6 @@ static void humidity_menu_presenter(void)
     bsp_serial_write(") Set calibration max.\n");
     bsp_serial_write("b) Return to calibration.\n");
     bsp_serial_write("> ");
-}
-
-static void update_canbus_uint16(void * args)
-{
-    uint16_t opt = strtol((const char *)args, NULL, 10);
-
-    if(canbus_data.setter_uint16(opt) == OKAY)
-    {
-        bsp_serial_write(canbus_data.message);
-        bsp_serial_print(opt);
-        bsp_serial_write("\n");
-        breadcrumbs_leave();
-    }
-    else 
-    {
-        bsp_serial_write("Error: Failed to update.\n");
-    }
 }
 
 static void update_canbus_uint8(void * args)
@@ -471,7 +450,6 @@ int terminal_initialize(void)
     breadcrumbs.level = 0;
     breadcrumbs.presenters[0] = main_menu_presenter;
     breadcrumbs.handlers[0] = main_menu_handler;
-    allowed_chars = "012";
 
     // Check the SD card status.
     if(get_sdcard_status() != OKAY)
@@ -484,7 +462,7 @@ int terminal_initialize(void)
     return 0;
 }
 
-static void breadcrumbs_enter(void (* h)(void *), void (* p)(void *))
+static void breadcrumbs_enter(void (* h)(void *), void (* p)(void))
 {
     breadcrumbs.level += 1;
 
@@ -503,54 +481,59 @@ static void display()
     {
         // Display the current menu.
         bsp_serial_write("---------------\n");
-        breadcrumbs.presenters[breadcrumbs.level](NULL);
+        breadcrumbs.presenters[breadcrumbs.level]();
         allow_display = false;
         allow_read = true;
     }
+}
+
+static inline bool in_allowed_chars(char value)
+{
+    uint8_t index = 0;
+    char c;
+    do {
+	c = *(allowed_chars + index);
+	if(c == value)
+	{
+	    return true;
+	}
+	else
+	{
+	    index += 1;
+	}
+    } while(c != '\0');
+   
+    return false;
 }
 
 static void read()
 {
     if(allow_read == true)
     {
-        char value = 0;
-        char * c = allowed_chars;
-        bool ok = false;
-        if(bsp_serial_available() > 0)
-        {
-            value = bsp_serial_read();
-            while(c != '\0');
-            {
-                if(c == value)
-                {
-                    ok = true;
-                    continue;
-                }
-                else
-                {
-                    ;
-                }
-            }   
+	char value = 0;
+	if(bsp_serial_available() > 0)
+	{
+	    value = bsp_serial_read();
 
-            if(!ok)
-            {
-                return;
-            }
-            else 
-            {
-                if(value == '\n')
-                {
-                    allow_read = false;
-                    allow_handle = true;
-                    input_index = 0;
-                    return;
-                }
+	    if(in_allowed_chars(value))
+	    {
+		if(value == '\n')
+		{
+		    allow_read = false;
+		    allow_handle = true;
+		    input_index = 0;
+		    return;
+		}
 
-                bsp_serial_print_char(value);
-                *(input + input_index) = value;
-                input_index += 1;
-            }
-        }
+		bsp_serial_print_char(value);
+		*(input + input_index) = value;
+		input_index += 1;
+	    }
+	    else 
+	    {
+		return;
+	    }
+	}
     }
 }
 
