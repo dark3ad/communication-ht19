@@ -548,13 +548,17 @@ static void temperature_menu_presenter(void * args)
 
 static void logged_files_menu_handler(void * args)
 {
+
   filelist_t list = sdcard_get_files_list();
+  uint8_t i = 0;
   char buffer[255] = {};
-  for(uint8_t i = 0; i < 2; i++)
+
+  while(list.logs[i] != NULL && i < DAYS)
   {
-    if(memcmp(list.logs[i], args, sizeof(char) * 2) == 0)
+    if(memcmp(list.logs[i], args, sizeof(char) * FILE_LENGTH) == 0)
     {
-      sdcard_read_file(list.logs[i], buffer, 13);
+      sdcard_read_file(list.logs[i], buffer, sizeof(uint16_t));
+      while()
       bsp_serial_write(buffer);
       bsp_serial_write("\n");
       return;
