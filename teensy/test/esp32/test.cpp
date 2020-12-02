@@ -10,10 +10,20 @@
 #include <bsp_time.h>
 #include <i2c_driver.h>
 
+#include <string.h>
+
 extern void handle_request(void);
 extern void handle_receive(size_t length);
 
-static uint8_t i2c_status = 0;
+// Assume that data received from esp32 via i2c
+static char rx_buffer[19 + 1] = {};
+static uint8_t i2c_status;
+
+static void reset_variables()
+{
+    i2c_status = UNINITIALIZED;
+    memset(rx_buffer, 0, sizeof(rx_buffer));
+}
 
 uint8_t i2c_driver_init(void (*request)(void), void (*recieve)(size_t))
 {
@@ -22,6 +32,11 @@ uint8_t i2c_driver_init(void (*request)(void), void (*recieve)(size_t))
 
 uint8_t i2c_driver_read(uint8_t *data, size_t size)
 {
+
+    memcpy(data, rx_buffer, size);
+
+    i2c_status = OKAY;
+
     return i2c_status;
 }
 
@@ -70,6 +85,7 @@ void bsp_set_time(uint16_t _year, uint8_t _month, uint8_t _day, uint8_t _hour, u
 
 void setUp(void)
 {
+    reset_variables();
 }
 
 void tearDown(void)
@@ -78,13 +94,33 @@ void tearDown(void)
 
 void test_esp32_init(void)
 {
-    /* i2c_status = OKAY;
+    i2c_status = OKAY;
     esp32_init();
     TEST_ASSERT_EQUAL_UINT8(OKAY, get_esp32_status());
 
     i2c_status = ERROR;
     esp32_init();
-    TEST_ASSERT_EQUAL_UINT8(ERROR, get_esp32_status());*/
+    TEST_ASSERT_EQUAL_UINT8(ERROR, get_esp32_status());
+}
+void test_rtc_status(void)
+{
+    int size;
+
+    TEST_ASSERT_EQUAL_UINT8(UNINITIALIZED, get_rtc_status());
+
+    // if time length is not  equal to 19 and  time formate is not correct
+    // expecting RTC status still uninitialized
+    sprintf(rx_buffer, "%d-%d-%d %d:%d", 2049, 11, 60, 11, 20);
+    size = strlen((char *)rx_buffer);
+    handle_receive(20);
+    TEST_ASSERT_EQUAL_UINT8(UNINITIALIZED, get_rtc_status());
+
+    // if time length is  equal to 19 and  time formate is also correct
+    // expecting RTC status Okay
+    sprintf(rx_buffer, "%d-%d-%d %d:%d:%d", 2020, 11, 25, 11, 20, 30);
+    size = strlen((char *)rx_buffer);
+    // handle_receive(size);
+    // TEST_ASSERT_EQUAL_UINT8(OKAY, get_rtc_status());
 }
 
 #ifdef TARGET
@@ -101,6 +137,9 @@ int main(void)
 {
 #endif
     UNITY_BEGIN();
+
+    RUN_TEST(test_esp32_init);
+    RUN_TEST(test_rtc_status);
 
 #ifdef TARGET
     UNITY_END();
