@@ -9,8 +9,8 @@
 
 #define DATETIME_LENGTH (19U)
 
-static void handle_request(void);
-static void handle_receive(size_t length);
+void handle_request(void);
+void handle_receive(size_t length);
 
 void esp32_init(void)
 {
@@ -32,7 +32,7 @@ void esp32_run(void)
     }
 }
 
-static void handle_receive(size_t length)
+void handle_receive(size_t length)
 {
     char data[length + 1] = {};
     uint8_t esp32_status = I2C_ERROR;
@@ -83,7 +83,7 @@ static void handle_receive(size_t length)
     set_esp32_status(esp32_status);
 }
 
-static void handle_request(void)
+void handle_request(void)
 {
     char buffer[PAYLOADS_LENGTH] = {};
     get_payloads(buffer);

@@ -123,7 +123,7 @@ void test_esp32_init(void)
 // checking rtc status
 void test_rtc_status(void)
 {
-    int size;
+    int size = 0;
 
     TEST_ASSERT_EQUAL_UINT8(UNINITIALIZED, get_rtc_status());
 
@@ -134,12 +134,76 @@ void test_rtc_status(void)
     handle_receive(size);
     TEST_ASSERT_EQUAL_UINT8(UNINITIALIZED, get_rtc_status());
 
+    reset_variables();
+
     // if time length is  equal to 19 and  time formate is also correct
     // expecting RTC status Okay
     sprintf(rx_buffer, "%d-%d-%d %d:%d:%d", 2020, 11, 25, 11, 20, 30);
     size = strlen((char *)rx_buffer);
-    // handle_receive(size);
-    // TEST_ASSERT_EQUAL_UINT8(OKAY, get_rtc_status());
+    handle_receive(size);
+    TEST_ASSERT_EQUAL_UINT8(OKAY, get_esp32_status());
+    TEST_ASSERT_EQUAL_UINT8(OKAY, get_rtc_status());
+}
+
+void test_esp32_status(void)
+{
+    //------------------------------------------------------------------------------------------------------------//
+    /* rx_buffer is status(WIFI_DISCONNECCTED, MQTT_DISCONNECCTED,MQTT_PUBLISH _ERROR,NTP_ERROR) from esp32 via i2c */
+    //------------------------------------------------------------------------------------------------------------//
+
+    int size = 0;
+
+    // if status is wifi disconnected
+    sprintf(rx_buffer, "%c", WIFI_DISCONNECTED);
+    size = strlen((char *)rx_buffer);
+    handle_receive(size);
+    TEST_ASSERT_EQUAL_UINT8(WIFI_DISCONNECTED, get_esp32_status());
+
+    reset_variables();
+
+    // if status is mqtt disconnected
+    sprintf(rx_buffer, "%c", MQTT_DISCONNECTED);
+    size = strlen((char *)rx_buffer);
+    handle_receive(size);
+    TEST_ASSERT_EQUAL_UINT8(MQTT_DISCONNECTED, get_esp32_status());
+
+    reset_variables();
+
+    // if status is mqtt publish error
+    sprintf(rx_buffer, "%c", MQTT_PUBLISH_ERROR);
+    size = strlen((char *)rx_buffer);
+    handle_receive(size);
+    TEST_ASSERT_EQUAL_UINT8(MQTT_PUBLISH_ERROR, get_esp32_status());
+
+    //-------------------------//
+    /* handling request event */
+    //------------------------//
+
+    i2c_status = OKAY;
+    handle_request();
+    TEST_ASSERT_EQUAL_UINT8(OKAY, get_esp32_status());
+
+    i2c_status = I2C_ERROR;
+    handle_request();
+    TEST_ASSERT_EQUAL_UINT8(I2C_ERROR, get_esp32_status());
+}
+// checking rtc_status whether it is initialized or not  after esp32 run
+void test_ep32_run(void)
+{
+    int size = 0;
+    //if rtc_status is  okay,then  all rtc values set and we can expect the same
+    sprintf(rx_buffer, "%d-%d-%d %d:%d:%d", 2020, 11, 25, 11, 20, 30);
+    size = strlen((char *)rx_buffer);
+    handle_receive(size);
+
+    TEST_ASSERT_EQUAL_UINT8(OKAY, get_rtc_status());
+    esp32_run();
+    TEST_ASSERT_EQUAL_UINT8(2020, get_rtc_year());
+    TEST_ASSERT_EQUAL_UINT8(11, get_rtc_month());
+    TEST_ASSERT_EQUAL_UINT8(25, get_rtc_day());
+    TEST_ASSERT_EQUAL_UINT8(11, get_rtc_hour());
+    TEST_ASSERT_EQUAL_UINT8(20, get_rtc_minute());
+    TEST_ASSERT_EQUAL_UINT8(30, get_rtc_second());
 }
 
 #ifdef TARGET
@@ -159,6 +223,8 @@ int main(void)
 
     RUN_TEST(test_esp32_init);
     RUN_TEST(test_rtc_status);
+    RUN_TEST(test_esp32_status);
+    RUN_TEST(test_ep32_run);
 
 #ifdef TARGET
     UNITY_END();
