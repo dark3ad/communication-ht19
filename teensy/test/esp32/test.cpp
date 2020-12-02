@@ -16,7 +16,7 @@ extern void handle_request(void);
 extern void handle_receive(size_t length);
 
 // Assume that data received from esp32 via i2c
-static char rx_buffer[19 + 1] = {};
+static char rx_buffer[20] = {};
 // faking variables
 static uint8_t i2c_status;
 static uint16_t Year;
@@ -38,6 +38,7 @@ static void reset_variables()
     memset(rx_buffer, 0, sizeof(rx_buffer));
 }
 //-------------------------------- faked functions --------------------------------//
+
 uint8_t i2c_driver_init(void (*request)(void), void (*recieve)(size_t))
 {
     return i2c_status;
@@ -85,10 +86,6 @@ uint8_t bsp_second(void)
     return Second;
 }
 
-void bsp_delay(uint32_t ms)
-{
-}
-
 void bsp_set_time(uint16_t _year, uint8_t _month, uint8_t _day, uint8_t _hour, uint8_t _minute, uint8_t _second)
 {
     Year = _year;
@@ -119,6 +116,7 @@ void test_esp32_init(void)
     esp32_init();
     TEST_ASSERT_EQUAL_UINT8(ERROR, get_esp32_status());
 }
+
 // By assuming rx_buffer is date_time from esp32 [ YYYY-MM-DD HH:MM:SS ] via 12c
 // checking rtc status
 void test_rtc_status(void)
@@ -145,9 +143,11 @@ void test_rtc_status(void)
     TEST_ASSERT_EQUAL_UINT8(OKAY, get_rtc_status());
 }
 
+// checking esp32 status
 void test_esp32_status(void)
 {
     //------------------------------------------------------------------------------------------------------------//
+    /* handling receive event */
     /* rx_buffer is status(WIFI_DISCONNECCTED, MQTT_DISCONNECCTED,MQTT_PUBLISH _ERROR,NTP_ERROR) from esp32 via i2c */
     //------------------------------------------------------------------------------------------------------------//
 
@@ -187,6 +187,7 @@ void test_esp32_status(void)
     handle_request();
     TEST_ASSERT_EQUAL_UINT8(I2C_ERROR, get_esp32_status());
 }
+
 // checking rtc_status whether it is initialized or not  after esp32 run
 void test_ep32_run(void)
 {
