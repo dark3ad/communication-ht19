@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #endif
 
+#include <stdio.h>
 #include <unity.h>
 #include <esp32.h>
 #include <common.h>
