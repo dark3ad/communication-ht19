@@ -1,5 +1,9 @@
 # Greenhouse: Communication Node
 
+![Product Owner Status](https://img.shields.io/badge/Product%20Owner%20Review-Approved-success?style=for-the-badge&logo=farfetch)
+
+![Lines of code](https://img.shields.io/tokei/lines/github/farochmehri/communication-ht19)
+
 ## Requirements:
 
 These requirements are defined according to these criteras:
