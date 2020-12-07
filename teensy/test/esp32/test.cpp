@@ -114,9 +114,9 @@ void test_esp32_init(void)
     esp32_init();
     TEST_ASSERT_EQUAL_UINT8(OKAY, get_esp32_status());
 
-    // i2c_status = ERROR;
-    // esp32_init();
-    // TEST_ASSERT_EQUAL_UINT8(ERROR, get_esp32_status());
+    i2c_status = ERROR;
+    esp32_init();
+    TEST_ASSERT_EQUAL_UINT8(ERROR, get_esp32_status());
 }
 
 // By assuming rx_buffer is date_time from esp32 [ YYYY-MM-DD HH:MM:SS ] via 12c
