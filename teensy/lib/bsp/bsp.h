@@ -1,7 +1,7 @@
 #ifndef BSP_H
 #define BSP_H
 
-//#include <common.h>
+#include <common.h>
 
 #ifdef TARGET
 #include <Arduino.h>
@@ -14,10 +14,6 @@
 void bsp_serial_begin(void);
 
 char bsp_serial_read(void);
-
-void bsp_serial_print(int value);
-
-void bsp_serial_print_char(char value);
 
 void bsp_serial_write(const char *msg);
 

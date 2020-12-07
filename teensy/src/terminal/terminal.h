@@ -8,8 +8,23 @@
 
 #define TERMINAL_H
 
+#include <stdint.h>
+
+struct breadcrumbs_t {
+    void (*presenters[5])(void);
+    void (*handlers[5])(char *);
+    uint8_t level;
+};
+
+struct canbus_data_t {
+    bool (* setter_uint8)(uint8_t value);
+    const char * message;
+};
+
 int terminal_initialize(void);
 void terminal_run(void);
+
+void update_canbus_uint8(char * args);
 
 
 #endif /* end of include guard TERMINAL_H */
