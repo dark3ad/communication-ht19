@@ -3,6 +3,7 @@
 #endif
 
 #include <unity.h>
+#include <common.h>
 #include <bsp_io.h>
 #include <led_driver.h>
 
