@@ -10,9 +10,7 @@
 
 void setup()
 {
-  bsp_serial_begin();
-  delay(2000);
-  terminal_initialize();
+  terminal_init();
 }
 
 void loop()

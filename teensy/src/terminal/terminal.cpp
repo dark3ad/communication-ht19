@@ -1,142 +1,64 @@
 /**
  * @author      : jesper (jesper@jesper-HP-ENVY-Laptop-13-aq0xxx)
- * @file        : terminal
- * @created     : tisdag nov 10, 2020 13:28:56 CET
+ * @file        : terminal_new
+ * @created     : måndag dec 07, 2020 10:56:45 CET
  */
 
-#include <stdio.h>
 #include <terminal.h>
-#include <canbus.h>
-#include <candata.h>
-#include <common.h>
-#include <string.h>
-#include <bsp.h>
-#include <sdcard.h>
-#include <unistd.h>
-#include <stdlib.h>
 
-#define READ_BUFFER_SIZE 64
+#define TERMINAL_STATE_READ 0
+#define TERMINAL_STATE_CHECK 1
+#define TERMINAL_STATE_EXECUTE 2
+#define TERMINAL_STATE_DISPLAY 3
 
-#define MAIN_MENU_SNAPSHOT "0"
-#define MAIN_MENU_FILES "1"
-#define MAIN_MENU_CALIBRATION "2"
+#define TERMINAL_INPUT_MAX 16
+#define BREADCRUMB_LEVEL_MAX 6
 
-#define CALIBRATION_MENU_TEMPERATURE "0"
-#define CALIBRATION_MENU_HUMIDITY "1"
-#define CALIBRATION_MENU_LIGHT_INTENSITY "2"
-#define CALIBRATION_MENU_WATER_LEVEL "3"
-#define CALIBRATION_MENU_SOIL_MOISTURE "4"
+typedef struct
+{
+    const char *match;
+    void (*display)(void);
+    void (*execute)(void);
+} terminal_menu_t;
 
-#define TEMP_MENU_SET_TARGET_MIN "0"
-#define TEMP_MENU_SET_TARGET_MAX "1"
-#define TEMP_MENU_SET_CALI_MIN "2"
-#define TEMP_MENU_SET_CALI_MAX "3"
+static uint8_t terminal_state = 0;
+static char terminal_input[TERMINAL_INPUT_MAX] = {};
+static terminal_menu_t breadcrumbs[BREADCRUMB_LEVEL_MAX] = {};
+static uint8_t breadcrumbs_level = 0;
+static bool execution_completed = true;
 
-#define HUM_MENU_SET_TARGET_MIN "0"
-#define HUM_MENU_SET_TARGET_MAX "1"
-#define HUM_MENU_SET_CALI_MIN "2"
-#define HUM_MENU_SET_CALI_MAX "3"
+static terminal_menu_t menu_main;
+static terminal_menu_t menu_files;
 
-#define MOIS_MENU_SET_TARGET_MIN "0"
-#define MOIS_MENU_SET_TARGET_MAX "1"
+static void get_snapshot();
 
-#define WATER_LEVEL_MENU_TARGET_MIN "0"
-#define WATER_LEVEL_MENU_TARGET_MAX "1"
+static inline terminal_menu_t *terminal_current_menu();
 
-#define LIGHT_MENU_TARGET_MIN "0"
-
-bool allow_display = true;
-bool allow_read = false;
-bool allow_handle = false;
-
-char allowed_chars[] = "b0123456789-\n\0";
-
-uint8_t input_index = 0;
-
-breadcrumbs_t breadcrumbs;
-canbus_data_t canbus_data;
-
-static char input[READ_BUFFER_SIZE] = {0};
-
-static void temperature_menu_presenter(void);
-static void temperature_menu_handler(char * args);
-
-static void humidity_menu_presenter(void);
-static void humidity_menu_handler(char * args);
-
-static void light_menu_presenter(void);
-static void light_menu_handler(char * args);
-
-static void moisture_menu_presenter(void);
-static void moisture_menu_handler(char * args);
-
-static void water_level_menu_presenter(void);
-static void water_level_menu_handler(char * args);
-
-static void breadcrumbs_enter(void (* h)(char *), void (* p)(void));
+static void breadcrumbs_enter(terminal_menu_t *menu);
 static void breadcrumbs_leave();
 
-static void target_max_presenter(void)
-{
-    bsp_serial_write("Enter target max: ");
-}
+static void menu_main_display();
+static void menu_main_execute();
 
-static void target_min_presenter(void)
-{
-    bsp_serial_write("Enter target min: ");
-}
+static void menu_files_display();
+static void menu_files_execute();
 
-static void calibration_min_presenter(void)
+void terminal_init(void)
 {
-    bsp_serial_write("Enter calibration min: ");
-}
+    // Define the menus.
+    menu_main = terminal_menu_t{"01\n", menu_main_display, menu_main_execute};
+    menu_files = terminal_menu_t{"0123456789b\n", menu_files_display, menu_files_execute};
 
-static void calibration_max_presenter(void)
-{
-    bsp_serial_write("Enter calibration max: ");
-}
+    // Set menu main to be the first menu in breadcrumbs list.
+    breadcrumbs_level = 0;
+    breadcrumbs[0] = menu_main;
 
-static void calibration_menu_presenter(void)
-{
-    bsp_serial_write(CALIBRATION_MENU_TEMPERATURE);
-    bsp_serial_write(") Temperature.\n");
-    bsp_serial_write(CALIBRATION_MENU_HUMIDITY);
-    bsp_serial_write(") Humidity.\n");
-    bsp_serial_write(CALIBRATION_MENU_LIGHT_INTENSITY);
-    bsp_serial_write(") Light Intensity.\n");
-    bsp_serial_write(CALIBRATION_MENU_WATER_LEVEL);
-    bsp_serial_write(") Water Level.\n");
-    bsp_serial_write("b) Back to main menu.\n");
-    bsp_serial_write("> ");
-}
+    // The Terminal should start by showing the main menu.
+    terminal_state = TERMINAL_STATE_DISPLAY;
 
-static void calibration_menu_handler(char * args)
-{
-    if(memcmp(args, CALIBRATION_MENU_TEMPERATURE, 1) == 0)
-    {
-	breadcrumbs_enter(temperature_menu_handler, temperature_menu_presenter);
-	return;
-    }
-    if(memcmp(args, CALIBRATION_MENU_HUMIDITY, 1) == 0)
-    {
-	breadcrumbs_enter(humidity_menu_handler, humidity_menu_presenter);
-	return;
-    }
-    if(memcmp(args, CALIBRATION_MENU_SOIL_MOISTURE, 1) == 0)
-    {
-	breadcrumbs_enter(moisture_menu_handler, moisture_menu_presenter);
-	return;
-    }
-    if(memcmp(args, CALIBRATION_MENU_WATER_LEVEL, 1) == 0)
-    {
-	breadcrumbs_enter(water_level_menu_handler, water_level_menu_presenter);
-	return;
-    }
-    if(memcmp(args, CALIBRATION_MENU_LIGHT_INTENSITY, 1) == 0)
-    {
-	breadcrumbs_enter(light_menu_handler, light_menu_presenter);
-	return;
-    }
+    set_terminal_status(CONNECTED);
+
+    bsp_serial_begin();
 }
 
 static void get_snapshot(void)
@@ -183,381 +105,252 @@ static void get_snapshot(void)
     bsp_serial_write(buffer);
 }
 
-static void water_level_menu_handler(char * args)
+void terminal_run(void)
 {
-    if(memcmp(args, WATER_LEVEL_MENU_TARGET_MIN, 1) == 0)
+    static char input[2] = {};
+    static char c;
+    static char check_index;
+    static char store_index;
+
+    if(get_sdcard_status() == UNINITIALIZED)
     {
-	canbus_data.setter_uint8 = set_water_level_target_min;
-	canbus_data.message = "Update water level target min: ";
-	breadcrumbs_enter(update_canbus_uint8, target_min_presenter);
-	return;
+	sdcard_init();
+	set_sdcard_status(OKAY);
     }
-    if(memcmp(args, WATER_LEVEL_MENU_TARGET_MAX, 1) == 0)
+
+    switch(terminal_state)
     {
-	canbus_data.setter_uint8 = set_water_level_target_max;
-	canbus_data.message = "Update water level target max: ";
-	breadcrumbs_enter(update_canbus_uint8, target_max_presenter);
-	return;
+	case TERMINAL_STATE_CHECK:
+
+	    // This means that there are no more characters to match.
+	    // So if this is true, return to read state.
+	    if(*(terminal_current_menu()->match + check_index) == '\0')
+	    {
+		terminal_state = TERMINAL_STATE_READ;
+	    }
+
+	    // If there are any matching characters, then store the character.
+	    if(*(terminal_current_menu()->match + check_index) == c)
+	    {
+		sprintf(input, "%c", c);
+		bsp_serial_write(input);
+
+		if(c == '\n')
+		{
+		    terminal_state = TERMINAL_STATE_EXECUTE;
+		    store_index = 0;
+		}
+		else
+		{
+		    *(terminal_input + store_index) = c;
+		    store_index += 1;
+		}
+	    }
+
+	    check_index += 1;
+	    break;
+
+	case TERMINAL_STATE_READ:
+	    if(bsp_serial_available > 0)
+	    {
+		if((c = bsp_serial_read()) > 0)
+		{
+		    terminal_state = TERMINAL_STATE_CHECK;
+		    check_index = 0;
+		}
+	    }
+	    break;
+
+	case TERMINAL_STATE_EXECUTE:
+	    terminal_current_menu()->execute();
+	    if(execution_completed)
+	    {
+		terminal_state = TERMINAL_STATE_DISPLAY;
+
+		//Gotta reset that input after we executed out command.
+		memset(input, 0, sizeof(input));
+	    }
+	    break;
+
+	case TERMINAL_STATE_DISPLAY:
+	    terminal_current_menu()->display();
+	    if(execution_completed)
+	    {
+		terminal_state = TERMINAL_STATE_READ;
+	    }
+	    break;
     }
 }
 
-static void water_level_menu_presenter(void)
+static inline terminal_menu_t * terminal_current_menu(void)
 {
-    bsp_serial_write(WATER_LEVEL_MENU_TARGET_MIN);
-    bsp_serial_write(") Update water level target min.\n");
-    bsp_serial_write(WATER_LEVEL_MENU_TARGET_MAX);
-    bsp_serial_write(") Update water level target max.\n");
-    bsp_serial_write("b) Back to calibration.\n");
-    bsp_serial_write("> ");
+    return &breadcrumbs[breadcrumbs_level];
 }
 
-static void moisture_menu_presenter(void)
+static void breadcrumbs_enter(terminal_menu_t * menu)
 {
-    bsp_serial_write(MOIS_MENU_SET_TARGET_MIN);
-    bsp_serial_write(") Update soil moisture sensor target min.\n");
-    bsp_serial_write(MOIS_MENU_SET_TARGET_MAX);
-    bsp_serial_write(") Update soil moisture sensor target max.\n");
-    bsp_serial_write("b) Back to calibration.\n");
-    bsp_serial_write("> ");
-}
-
-static void moisture_menu_handler(char * args)
-{
-    if(memcmp(args, MOIS_MENU_SET_TARGET_MIN, 1) == 0)
-    {
-	canbus_data.setter_uint8 = set_soil_moisture_target_min;
-	canbus_data.message = "Update soil moisture target min: ";
-	breadcrumbs_enter(update_canbus_uint8, target_min_presenter);
-	return;
-    }
-    if(memcmp(args, MOIS_MENU_SET_TARGET_MAX, 1) == 0)
-    {
-	canbus_data.setter_uint8 = set_soil_moisture_target_max;
-	canbus_data.message = "Update soil moisture target max: ";
-	breadcrumbs_enter(update_canbus_uint8, target_max_presenter);
-	return;
-    }
-}
-
-static void light_menu_handler(char * args)
-{
-    if(memcmp(args, LIGHT_MENU_TARGET_MIN, 1) == 0)
-    {
-	canbus_data.setter_uint8 = set_light_intensity_target_min;
-	canbus_data.message = "Update light intensity: ";
-	breadcrumbs_enter(update_canbus_uint8, target_min_presenter);
-	return;
-    }
-}
-
-static void light_menu_presenter(void)
-{
-    bsp_serial_write(LIGHT_MENU_TARGET_MIN);
-    bsp_serial_write(") Update light intensity target min.\n");
-    bsp_serial_write("b) Back to calibration.\n");
-    bsp_serial_write("> ");
-}
-
-static void humidity_menu_handler(char * args)
-{
-    if(memcmp(args, HUM_MENU_SET_TARGET_MIN, 1) == 0)
-    {
-	canbus_data.setter_uint8 = set_humidity_target_min;
-	canbus_data.message = "Update humidity target min: ";
-	breadcrumbs_enter(update_canbus_uint8, target_min_presenter);
-	return;
-    }
-    if(memcmp(args, HUM_MENU_SET_TARGET_MAX, 1) == 0)
-    {
-	canbus_data.setter_uint8 = set_humidity_target_max;
-	canbus_data.message = "Update humidity target max: ";
-	breadcrumbs_enter(update_canbus_uint8, target_max_presenter);
-	return;
-    }
-    if(memcmp(args, HUM_MENU_SET_CALI_MIN, 1) == 0)
-    {
-	canbus_data.setter_uint8 = set_humidity_calibration_min;
-	canbus_data.message = "Update humidity calibration min: ";
-	breadcrumbs_enter(update_canbus_uint8, calibration_min_presenter);
-	return;
-    }
-    if(memcmp(args, HUM_MENU_SET_CALI_MAX, 1) == 0)
-    {
-	canbus_data.setter_uint8 = set_humidity_calibration_max;
-	canbus_data.message = "Update humidity calibration max: ";
-	breadcrumbs_enter(update_canbus_uint8, calibration_max_presenter);
-	return;
-    }
-}
-
-static void humidity_menu_presenter(void)
-{
-    bsp_serial_write(HUM_MENU_SET_TARGET_MIN);
-    bsp_serial_write(") Set target min.\n");
-    bsp_serial_write(HUM_MENU_SET_TARGET_MAX);
-    bsp_serial_write(") Set target max.\n");
-    bsp_serial_write(HUM_MENU_SET_CALI_MIN);
-    bsp_serial_write(") Set calibration min.\n");
-    bsp_serial_write(HUM_MENU_SET_CALI_MAX);
-    bsp_serial_write(") Set calibration max.\n");
-    bsp_serial_write("b) Return to calibration.\n");
-    bsp_serial_write("> ");
-}
-
-void update_canbus_uint8(char * args)
-{
-    uint8_t opt = strtol(args, NULL, 10);
-
-    if(canbus_data.setter_uint8(opt) == OKAY)
-    {
-	bsp_serial_write(canbus_data.message);
-	bsp_serial_write((const char *)args);
-	bsp_serial_write("\n");
-	breadcrumbs_leave();
-    }
-    else 
-    {
-	bsp_serial_write("Error: Failed to update.\n");
-    }
-}
-
-static void temperature_menu_handler(char * args)
-{
-    if(memcmp(args, TEMP_MENU_SET_TARGET_MIN, 1) == 0)
-    {
-	canbus_data.setter_uint8 = set_temperature_target_min;
-	canbus_data.message = "Update temperature target min: ";
-	breadcrumbs_enter(update_canbus_uint8, target_min_presenter);
-	return;
-    }
-    if(memcmp(args, TEMP_MENU_SET_TARGET_MAX, 1) == 0)
-    {
-	canbus_data.setter_uint8 = set_temperature_target_max;
-	canbus_data.message = "Update temperature target max: ";
-	breadcrumbs_enter(update_canbus_uint8, target_max_presenter);
-	return;
-    }
-    if(memcmp(args, TEMP_MENU_SET_CALI_MIN, 1) == 0)
-    {
-	canbus_data.setter_uint8 = set_temperature_calibration_min;
-	canbus_data.message = "Update temperature calibration min: ";
-	breadcrumbs_enter(update_canbus_uint8, calibration_min_presenter);
-	return;
-    }
-    if(memcmp(args, TEMP_MENU_SET_CALI_MAX, 1) == 0)
-    {
-	canbus_data.setter_uint8 = set_temperature_calibration_max;
-	canbus_data.message = "Update temperature calibration max: ";
-	breadcrumbs_enter(update_canbus_uint8, calibration_max_presenter);
-	return;
-    }
-}
-
-static void temperature_menu_presenter(void)
-{
-    bsp_serial_write(TEMP_MENU_SET_TARGET_MIN);
-    bsp_serial_write(") Set target min.\n");
-    bsp_serial_write(TEMP_MENU_SET_TARGET_MAX);
-    bsp_serial_write(") Set target max.\n");
-    bsp_serial_write(TEMP_MENU_SET_CALI_MIN);
-    bsp_serial_write(") Set calibration min.\n");
-    bsp_serial_write(TEMP_MENU_SET_CALI_MAX);
-    bsp_serial_write(") Set calibration max.\n");
-    bsp_serial_write("b) Return to calibration.\n");
-    bsp_serial_write("> ");
-}
-
-static void logged_files_menu_handler(char * args)
-{
-
-    filelist_t list = sdcard_get_files_list();
-    uint8_t i = 0;
-    char buffer[255] = {};
-
-    while(list.logs[i] != NULL && i < DAYS)
-    {
-	if(memcmp(list.logs[i], args, sizeof(char) * FILE_LENGTH) == 0)
-	{
-	    sdcard_read_file(list.logs[i], buffer, sizeof(uint16_t));
-	    //while()
-	    bsp_serial_write(buffer);
-	    bsp_serial_write("\n");
-	    return;
-	}
-    }
-    bsp_serial_write("Could not find file");
-}
-
-static void logged_files_menu_presenter(void)
-{
-    filelist_t list = sdcard_get_files_list();
-    for(uint8_t i = 0; i < 2; i++)
-    {
-	bsp_serial_write(list.logs[i]);
-	bsp_serial_write("\n");
-    }
-    bsp_serial_write("b) Return to main menu.\n");
-    bsp_serial_write("> ");
-}
-
-static void main_menu_presenter(void)
-{
-    bsp_serial_write("---- THE GREENHOUSE ----\n");
-    bsp_serial_write(MAIN_MENU_SNAPSHOT);
-    bsp_serial_write(") Get snapshop of the system.\n");
-    bsp_serial_write(MAIN_MENU_FILES);
-    bsp_serial_write(") Get list of logged files.\n");
-    bsp_serial_write(MAIN_MENU_CALIBRATION);
-    bsp_serial_write(") Calibrate the system.\n");
-    bsp_serial_write("> ");
-}
-
-static void main_menu_handler(char * args)
-{
-    if(memcmp(args, MAIN_MENU_SNAPSHOT, 1) == 0)
-    {
-	get_snapshot();
-	return;
-    }
-
-    if(memcmp(args, MAIN_MENU_FILES, 1) == 0)
-    {
-	breadcrumbs_enter(logged_files_menu_handler, logged_files_menu_presenter);
-	return;
-    }
-
-    if(memcmp(args, MAIN_MENU_CALIBRATION, 1) == 0)
-    {
-	breadcrumbs_enter(calibration_menu_handler, calibration_menu_presenter);
-	return;
-    }
-}
-
-int terminal_initialize(void)
-{
-    breadcrumbs.level = 0;
-    breadcrumbs.presenters[0] = main_menu_presenter;
-    breadcrumbs.handlers[0] = main_menu_handler;
-
-    // Check the SD card status.
-    if(get_sdcard_status() != OKAY)
-    {
-	// Then, turn it on, how hard can it be?
-	// set_sdcard_status(OKAY);
-    }
-
-    // Everything is fine, you are good to go!
-    return 0;
-}
-
-static void breadcrumbs_enter(void (* h)(char *), void (* p)(void))
-{
-    breadcrumbs.level += 1;
-
-    breadcrumbs.handlers[breadcrumbs.level] = h;
-    breadcrumbs.presenters[breadcrumbs.level] = p;
+    breadcrumbs_level += 1U;
+    breadcrumbs[breadcrumbs_level] = *menu;
 }
 
 static void breadcrumbs_leave()
 {
-    breadcrumbs.level -= 1;
+    breadcrumbs_level -= 1U;
 }
 
-static void display()
+static void menu_main_display(void)
 {
-    if(allow_display == true)
+    char buffer[128] = {};
+    sprintf(buffer + strlen(buffer), "\n0) Get Snapshot");
+    sprintf(buffer + strlen(buffer), "\n1) List logged files");
+    sprintf(buffer + strlen(buffer), "\n> ");
+
+    bsp_serial_write(buffer);
+}
+
+static void menu_main_execute(void)
+{
+    switch(terminal_input[0])
     {
-	// Display the current menu.
-	bsp_serial_write("---------------\n");
-	breadcrumbs.presenters[breadcrumbs.level]();
-	allow_display = false;
-	allow_read = true;
+	case '0':
+	    get_snapshot();
+	    break;
+	case '1':
+	    breadcrumbs_enter(&menu_files);
+	    break;
+	default:
+	    bsp_serial_write("Command not found: ");
+	    bsp_serial_write(terminal_input);
+	    bsp_serial_write("\n");
+	    break;
+	    // TODO: add default action;
     }
 }
 
-static inline bool in_allowed_chars(char value)
-{
-    uint8_t index = 0;
-    char c;
-    do {
-	c = *(allowed_chars + index);
-	if(c == value)
-	{
-	    return true;
-	}
-	else
-	{
-	    index += 1;
-	}
-    } while(c != '\0');
+/*
 
-    return false;
+bool calibration_system_display()
+{
+    char buffer[128] = {};
+    sprintf(buffer + strlen(buffer), "\n0) temperature\n");
+    sprintf(buffer + strlen(buffer), "> ");
+
+    bsp_serial_write(buffer);
+    return true;
 }
 
-static void read()
+bool calibrate_temperature_instructions()
 {
-    if(allow_read == true)
+    char buffer[258] = {};
+    sprintf(buffer + strlen(buffer), "\nTargets: \n");
+    sprintf(buffer + strlen(buffer), "	0)	target_min\n");
+    sprintf(buffer + strlen(buffer), "	1)	target max\n");
+    sprintf(buffer + strlen(buffer), "\nCommands: \n");
+    sprintf(buffer + strlen(buffer), "	set [target] [value]	Update canbus target with value\n");
+    sprintf(buffer + strlen(buffer), "	b)			Return to calibration\n");
+    sprintf(buffer + strlen(buffer), "> ");
+
+    bsp_serial_write(buffer);
+    return true;
+}
+
+bool calibrate_system()
+{
+    breadcrumbs_enter(cali_term);
+    return true;
+}
+
+bool calibrate_temperature()
+{
+    breadcrumbs_enter(temperature_menu);
+    return true;
+}
+
+*/
+
+static void menu_files_display(void)
+{
+    char buffer[258] = {};
+    filelist_t list = sdcard_get_files_list();
+    static uint16_t day = 0;
+
+    if(list.logs[day][0] == '\0')
     {
-	char value = 0;
-	char value_char[4];
-	if(bsp_serial_available() > 0)
-	{
-	    value = bsp_serial_read();
+	day = 0;
+	sprintf(buffer + strlen(buffer), "b)			Return to main menu\n");
+	sprintf(buffer + strlen(buffer), "\nEnter file name: \n");
+	sprintf(buffer + strlen(buffer), "> ");
+	bsp_serial_write(buffer);
+	execution_completed = true;
+    }
+    else
+    {
+	bsp_serial_write(list.logs[day]);
+	bsp_serial_write("\n");
+	day++;
+	execution_completed = false;
+    }
 
-	    if(in_allowed_chars(value))
-	    {
-		if(value == '\n')
-		{
-		    allow_read = false;
-		    allow_handle = true;
-		    input_index = 0;
-		    return;
-		}
+}
 
-		sprintf(value_char, "%c", value);
+static void menu_files_execute(void)
+{
+    char buffer[16 * 1024] = {};
+    if(terminal_input[0] == 'b')
+    {
+	breadcrumbs_leave();
+    }
 
-		bsp_serial_write(value_char);
-		*(input + input_index) = value;
-		input_index += 1;
-	    }
-	    else 
-	    {
-		return;
-	    }
-	}
+    if (SUCCESS == sdcard_read_file(terminal_input, buffer, sizeof(buffer) - 1))
+    {
+        if(*buffer)
+        {
+            bsp_serial_write(buffer);
+	    execution_completed = false;
+        }
+        else
+        {
+	    breadcrumbs_enter(&menu_files);
+	    execution_completed = true;
+        }
     }
 }
 
-static void handle()
+/*
+bool set_canbus_calibration_value()
 {
-    if(allow_handle == true)
+    char *arg;
+    char target;
+    uint16_t value;
+
+    SerialTerminal *temp = &breadcrumbs[breadcrumbs_level];
+
+    arg = temp->getNext();
+    if (arg == NULL)
     {
-	if(input[0] == 'b')
-	{
-	    breadcrumbs_leave();
-	    allow_handle = false;
-	    allow_display = true;
-	    return;
-	}
-
-	if(input[0] == 'q')
-	{
-	    allow_handle = false;
-	    allow_display = false;
-	    allow_read = false;
-	    return;
-	}
-
-	breadcrumbs.handlers[breadcrumbs.level](input);
-
-	allow_handle = false;
-	allow_display = true;
     }
-}
+    target = arg[0];
 
-void terminal_run(void)
-{
-    display();
-    read();
-    handle();
+    arg = temp->getNext();
+    if (arg == NULL)
+    {
+    }
+    value = strtol(arg, NULL, 10);
+
+    if (memcmp(temp, &temperature_menu, sizeof(&temperature_menu)) == 0)
+    {
+        switch (target)
+        {
+        case '0':
+            set_temperature_target_min((uint8_t)value);
+            break;
+        case '1':
+            set_temperature_target_max((uint8_t)value);
+            break;
+        }
+    }
+
+    show_instructions = true;
+    return true;
 }
+*/
