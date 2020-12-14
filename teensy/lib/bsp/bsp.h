@@ -6,7 +6,9 @@
 #ifdef TARGET
 #include <Arduino.h>
 #ifdef DEVELOPMENT
-#define PRINTF(frmt, ...) Serial.printf(frmt, __VA_ARGS__)
+#define PRINTF(frmt, ...)             \
+    Serial.printf(frmt, __VA_ARGS__); \
+    Serial.flush()
 #else
 #define PRINTF(frmt, ...)
 #endif
