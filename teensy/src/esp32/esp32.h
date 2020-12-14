@@ -1,7 +1,7 @@
 #ifndef ESP32_H
 #define ESP32_H
 
-#include <stdint.h>
+#define ESP32_INTERVAL (500U)
 
 /**
  * @brief This function is used to initialize the application

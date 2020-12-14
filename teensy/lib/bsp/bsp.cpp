@@ -5,7 +5,4 @@
 void bsp_serial_begin(void)
 {
     Serial.begin(BAUD_RATE);
-    while (!Serial)
-    {
-    }
 }
