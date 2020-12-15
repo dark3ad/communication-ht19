@@ -21,6 +21,8 @@ void bsp_serial_write(const char *msg);
 
 int bsp_serial_available(void);
 
+bool bsp_serial_dtr(void);
+
 #else
 #include <stdio.h>
 #ifdef DEVELOPMENT
