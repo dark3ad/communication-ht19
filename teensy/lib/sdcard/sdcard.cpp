@@ -184,7 +184,6 @@ uint8_t sdcard_read_file(const char *name, char *buffer, uint16_t length)
 {
     uint8_t status = SUCCESS;
     static uint32_t position = 0xFFFFFFFFU;
-
     if (!check_file_name(name))
     {
         position = 0xFFFFFFFFU;
