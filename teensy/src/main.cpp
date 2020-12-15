@@ -37,8 +37,3 @@ void setup()
     {
         print_error("Failed to start the scheduler");
     }
-}
-
-void loop()
-{
-}
