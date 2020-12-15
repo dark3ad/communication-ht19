@@ -18,6 +18,7 @@ void setup()
 {
 #ifdef DEVELOPMENT
     bsp_serial_begin();
+    bsp_delay(5000);
 #endif
 
     scheduler_init(NULL, NULL);
@@ -40,5 +41,4 @@ void setup()
 
 void loop()
 {
-
 }

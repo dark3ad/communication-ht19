@@ -120,7 +120,7 @@ bool scheduler_run(void)
                     {
                         tasks[i].run();
                         tasks[i].last_run_ms = ms_counter;
-                        PRINTF("%s was run @%d\n", tasks[i].name, ms_counter);
+                        // PRINTF("%s was run @%d\n", tasks[i].name, ms_counter);
                     }
                 }
             }

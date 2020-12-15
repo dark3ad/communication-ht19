@@ -31,6 +31,7 @@ void setup()
 {
 #ifdef DEVELOPMENT
     bsp_serial_begin();
+    bsp_delay(5000);
 #endif
 
     led_driver_init();

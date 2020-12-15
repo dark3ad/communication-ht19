@@ -88,7 +88,7 @@ filelist_t sdcard_get_files_list(void)
         for (uint8_t i = 1; i <= DAYS; i++)
         {
             char name[FILE_LENGTH] = {};
-            sprintf(name, "%02d", i);
+            sprintf(name, "%02d", i); // 02d?
             if (SD.exists(name))
             {
                 strcpy(result.logs[j], name);
