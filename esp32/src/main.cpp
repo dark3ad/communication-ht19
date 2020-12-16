@@ -36,16 +36,13 @@ void setup()
 
     led_driver_init();
 
-    if (!i2c_driver_init())
+    while (!i2c_driver_init())
     {
-        while (true)
-        {
-            // blink the led
-            led_driver_turn_on();
-            bsp_delay(500);
-            led_driver_turn_off();
-            bsp_delay(500);
-        }
+        // blink the led
+        led_driver_turn_on();
+        bsp_delay(500);
+        led_driver_turn_off();
+        bsp_delay(500);
     }
 
     wifi_driver_init(SSID, PASS);
@@ -110,6 +107,16 @@ void loop()
         }
 
         wifi_driver_connect();
+
+        status = OKAY;
+        if (!i2c_driver_write(&status, sizeof(status)))
+        {
+            led_driver_turn_on();
+        }
+        else
+        {
+            led_driver_turn_off();
+        }
     }
 
     if (!client.connected())
@@ -130,6 +137,16 @@ void loop()
 
             PRINTF("%s", ".");
             bsp_delay(1000);
+        }
+
+        status = OKAY;
+        if (!i2c_driver_write(&status, sizeof(status)))
+        {
+            led_driver_turn_on();
+        }
+        else
+        {
+            led_driver_turn_off();
         }
     }
 
