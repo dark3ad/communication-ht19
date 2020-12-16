@@ -5,9 +5,6 @@
 void bsp_serial_begin(void)
 {
   Serial.begin(BAUD_RATE);
-  while (!Serial)
-  {
-  }
 }
 
 void bsp_serial_write(const char *msg)

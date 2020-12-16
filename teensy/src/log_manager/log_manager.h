@@ -12,6 +12,8 @@
 #ifndef LOG_MANAGER_H
 #define LOG_MANAGER_H
 
+#define LOG_MANAGER_INTERVAL (1000U)
+
 /**
  * @brief this function initialises the logmanager and its necessesary components
  * 

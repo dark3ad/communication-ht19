@@ -90,7 +90,7 @@ static void get_snapshot(void)
     data_t data = get_candata();
     char buffer[KB_4_SIZE] = {};
 
-    sprintf(buffer + strlen(buffer), "\n\n[%s] ================================\n", data.communication.rtc.datetime);
+    sprintf(buffer + strlen(buffer), "\n\n[%s]\n================================\n", data.communication.rtc.datetime);
 
     get_terminal_text(buffer + strlen(buffer), data.communication.terminal);
     get_esp32_text(buffer + strlen(buffer), data.communication.esp32);
